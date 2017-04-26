@@ -8,8 +8,10 @@ def dev_connect():
 	print("Message is %s\n" % msg)
 	client.write_message("001")
 	while 1:
+		msg = yield client.read_message()
+		print("Message is %s\n" % msg)
 		continue
-	#client.close()
+	client.close()
 
 if __name__ == "__main__":
 	tornado.ioloop.IOLoop.instance().run_sync(dev_connect)
