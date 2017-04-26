@@ -1,29 +1,35 @@
-# README #
+	README
+======================
 
-This README would normally document whatever steps are necessary to get your application up and running.
+steps necessary to get server and hub-client up and running.
 
-### What is this repository for? ###
+I) INSTALLATION INSTRUCTIONS
+==============================
 
-* Quick summary
-* Version
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
+	1)Install virtualenv
+		$apt install virtualenv
+	2)Create a virtual python environment
+		$virtualenv env
+	3)Activate virtual environment
+		$source env/bin/activate
+	4)Install tornado
+		$pip install tornado
 
-### How do I get set up? ###
+II) Running the program
 
-* Summary of set up
-* Configuration
-* Dependencies
-* Database configuration
-* How to run tests
-* Deployment instructions
+	1) Run server
+		$python server.py
 
-### Contribution guidelines ###
+		This will run the server on localhost at port 8888 by default
 
-* Writing tests
-* Code review
-* Other guidelines
+	2) Run hub-client
+		$python dev_client.py
+		
+		This will try to connect to server running at localhost port 8888 by default.
+		Update the details if remote connection etc.
 
-### Who do I talk to? ###
-
-* Repo owner or admin
-* Other community or team contact
+	3)Access the server from a local/remote browser
+		URL= http://localhost:8888
+			or
+		URL= http://ip:8888 [if remote]
+		This should show connected hubs and provides and interface to send messages to hub via server
