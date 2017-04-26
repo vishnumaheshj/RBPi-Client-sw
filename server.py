@@ -46,7 +46,10 @@ class Userhandler(tornado.web.RequestHandler):
 				device.conn.write_message(message)
 				found = 1
 		if (found == 0):
-			print("Device not found\n")
+			self.write("Device not found\n")
+		else:
+			self.write("Message sent successfully\n")
+
 
 
 def main():
