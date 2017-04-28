@@ -17,6 +17,9 @@ I) INSTALLATION INSTRUCTIONS
 
 II) Running the program
 
+	0)Activate virtualenv if not already activated
+		$source env/bin/activate
+
 	1) Run server
 		$python server.py
 
