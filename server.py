@@ -5,7 +5,8 @@ import tornado.httpserver
 import tornado.websocket
 import tornado.ioloop
 import tornado.web
-
+import serverMethods
+#from serverMethods import *
 
 global_devlist = []
 
@@ -43,7 +44,14 @@ class Userhandler(tornado.web.RequestHandler):
 		found = 0
 		for device in global_devlist:
 			if(device.id == devid):
-				device.conn.write_message(message)
+				if (message[:4] == "cmd0"):
+					Msg = serverMethods.sentBoardInfoReq()
+					device.conn.write_message(Msg)
+				elif (message[:4] == "cmd1"):
+					Msg = serverMethods.sentStateChangeReq()
+					device.conn.write_message(Msg)
+				else:
+					device.conn.write_message(message)
 				found = 1
 		if (found == 0):
 			self.write("Device not found\n")
