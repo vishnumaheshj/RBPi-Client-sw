@@ -3,13 +3,13 @@ from switchboard import *
 
 def createMessageForHub(Msg):
     if Msg['message_type'] == SB_BOARD_INFO_REQ:
-        print "Info Req"
+        print ("Info Req")
         HubReq = sbMessage_t()
         HubReq.hdr.type = SB_BOARD_INFO_REQ
         HubReq.data.infoReqData.flags = 0
         return HubReq
     elif Msg['message_type'] == SB_STATE_CHANGE_REQ:
-        print "State Change Req"
+        print ("State Change Req")
         HubReq = sbMessage_t()
         HubReq.hdr.type = SB_STATE_CHANGE_REQ
         HubReq.data.boardData.sbType.type = SB_TYPE_4X4

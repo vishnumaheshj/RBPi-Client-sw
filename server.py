@@ -71,7 +71,7 @@ def main():
 		static_path = os.path.join(os.path.dirname(__file__), "static")
 	)
 	http_server = tornado.httpserver.HTTPServer(app)
-	http_server.listen(8888)
+	http_server.listen(8880)
 	tornado.ioloop.IOLoop.instance().start()
 
 if __name__ == "__main__":

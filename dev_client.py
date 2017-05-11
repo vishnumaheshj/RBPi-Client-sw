@@ -7,10 +7,10 @@ import json
 
 @gen.coroutine
 def dev_connect():
-    lib = cdll.LoadLibrary("/Users/pradulmt/Desktop/Repos/tornado_backend/shared/libshm.so")
+    lib = cdll.LoadLibrary("./libshm.so")
     id = lib.init_shm()
     #client = yield tornado.websocket.websocket_connect("ws://192.168.0.106:8888/dev")
-    client = yield tornado.websocket.websocket_connect("ws://localhost:8888/dev")
+    client = yield tornado.websocket.websocket_connect("ws://localhost:8880/dev")
     msg = yield client.read_message()
     print("Message is %s\n" % msg)
     client.write_message("001")
