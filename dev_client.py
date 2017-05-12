@@ -8,11 +8,13 @@ import json
 @gen.coroutine
 def dev_connect():
     lib = cdll.LoadLibrary("./libshm.so")
-    id = lib.init_shm()
+    readId = lib.init_read_shm()
+    writeId = lib.init_write_shm()
+
     #client = yield tornado.websocket.websocket_connect("ws://192.168.0.106:8888/dev")
     client = yield tornado.websocket.websocket_connect("ws://localhost:8880/dev")
     msg = yield client.read_message()
-    print("Message is %s\n" % msg)
+    print("%s\n" % msg)
     client.write_message("001")
     while 1:
         msg = yield client.read_message()
@@ -20,9 +22,8 @@ def dev_connect():
         Msg = json.loads(msg)
 
         Req = clientMethods.createMessageForHub(Msg)
-#        lib.update_shm(ctypes.create_string_buffer(msg.encode('utf-8'), id)
 
-        lib.update_shm(clientMethods.byref(Req), id)
+        lib.write_shm(clientMethods.byref(Req), writeId)
 
         continue
     client.close()
