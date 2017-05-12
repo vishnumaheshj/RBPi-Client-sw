@@ -23,8 +23,8 @@
 #include "switchboard.h"
 
 #define  NOT_READY  -1
-#define  FILLED     0
-#define  TAKEN      1
+#define  FILLED     1
+#define  TAKEN      0
 
 struct Memory {
 	int  status;
@@ -35,9 +35,14 @@ int init_write_shm()
 {
     key_t          ShmKEY;
     int            ShmID = -1;
+    struct Memory *ShmPTR;
 
     ShmKEY = ftok("/home", 'x');
     ShmID = shmget(ShmKEY, sizeof(struct Memory), IPC_CREAT | 0666);
+
+    ShmPTR = (struct Memory *) shmat(ShmID, NULL, 0);
+    memset(ShmPTR, NOT_READY, 256);
+    shmdt((void *) ShmPTR);
 
     return ShmID;
 }
@@ -65,6 +70,9 @@ int read_shm(char *data, int ShmID)
     if (ShmPTR == NULL)
 	    return -1;
 
+    while (ShmPTR->status != FILLED)
+        continue;
+
 	sMsg = (sbMessage_t *)ShmPTR->data;
 
     if (sMsg->hdr.message_type == SB_BOARD_INFO_RSP)
@@ -78,7 +86,7 @@ int read_shm(char *data, int ShmID)
      ShmPTR->status = TAKEN;
 
      shmdt((void *) ShmPTR);
-     return 0;
+     return dataSize;
 }
 
 int write_shm(char *data, int ShmID)
@@ -99,13 +107,12 @@ int write_shm(char *data, int ShmID)
     else
 	    dataSize = 128;
 
+    memset(ShmPTR->data, 0, 256);
+    memcpy(ShmPTR->data, data, dataSize);
+    ShmPTR->status = FILLED;
 
-     memset(ShmPTR->data, 0, 256);
-     memcpy(ShmPTR->data, data, dataSize);
-     ShmPTR->status = FILLED;
-
-     shmdt((void *) ShmPTR);
-     return 0;
+    shmdt((void *) ShmPTR);
+    return dataSize;
 }
 
 

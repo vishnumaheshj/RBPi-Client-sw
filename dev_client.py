@@ -25,6 +25,12 @@ def dev_connect():
 
         lib.write_shm(clientMethods.byref(Req), writeId)
 
+        inMsg = clientMethods.sbMessage_t()
+
+        lib.read_shm(clientMethods.byref(inMsg), readId)
+
+        client.write_message(inMsg)
+
         continue
     client.close()
 
