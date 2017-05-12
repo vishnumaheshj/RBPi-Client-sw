@@ -37,7 +37,7 @@ int init_write_shm()
     int            ShmID = -1;
     struct Memory *ShmPTR;
 
-    ShmKEY = ftok("/home", 'x');
+    ShmKEY = ftok("/home", 'a');
     ShmID = shmget(ShmKEY, sizeof(struct Memory), IPC_CREAT | 0666);
 
     ShmPTR = (struct Memory *) shmat(ShmID, NULL, 0);
@@ -52,7 +52,7 @@ int init_read_shm()
     key_t          ShmKEY;
     int            ShmID = -1;
 
-    ShmKEY = ftok("/home", 'y');
+    ShmKEY = ftok("/home", 'b');
     ShmID = shmget(ShmKEY, sizeof(struct Memory), IPC_CREAT | 0666);
 
     return ShmID;
