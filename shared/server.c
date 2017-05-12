@@ -20,6 +20,7 @@
 #include  <sys/shm.h>
 #include  <unistd.h>
 #include  <string.h>
+#include "switchboard.h"
 
 #define  NOT_READY  -1
 #define  FILLED     0
@@ -46,7 +47,7 @@ int init_read_shm()
     key_t          ShmKEY;
     int            ShmID = -1;
 
-    hmKEY = ftok("/home", 'y');
+    ShmKEY = ftok("/home", 'y');
     ShmID = shmget(ShmKEY, sizeof(struct Memory), IPC_CREAT | 0666);
 
     return ShmID;
@@ -64,7 +65,7 @@ int read_shm(char *data, int ShmID)
     if (ShmPTR == NULL)
 	    return -1;
 
-	sMsg = ShmPTR->data;
+	sMsg = (sbMessage_t *)ShmPTR->data;
 
     if (sMsg->hdr.message_type == SB_BOARD_INFO_RSP)
         dataSize = SB_BOARD_INFO_RSP_LEN;
@@ -111,6 +112,7 @@ int write_shm(char *data, int ShmID)
 int delete_shm(int ShmID)
 {
     shmctl(ShmID, IPC_RMID, NULL);
+    return 0;
 }
 
 
