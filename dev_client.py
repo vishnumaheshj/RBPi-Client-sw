@@ -29,7 +29,9 @@ def dev_connect():
 
         lib.read_shm(clientMethods.byref(inMsg), readId)
 
-        client.write_message(inMsg)
+        SerReq = clientMethods.createMessageForServer(inMsg)
+
+        client.write_message(SerReq)
 
         continue
     client.close()

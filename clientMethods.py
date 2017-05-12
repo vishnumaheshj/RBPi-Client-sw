@@ -22,3 +22,21 @@ def createMessageForHub(Msg):
         HubReq.data.boardData.switchData.state.switch7 = SW_DONT_CARE
         HubReq.data.boardData.switchData.state.switch8 = SW_DONT_CARE
         return HubReq
+
+def createMessageForServer(Msg):
+    if Msg.hdr.type == SB_BOARD_INFO_RSP:
+        print("Info Rsp")
+        SerReq = {'message_type': SB_BOARD_INFO_RSP}
+        SerReq['sbType']  = Msg.data.infoRspData.sbType.type
+        SerReq['switch1'] = Msg.data.infoRspData.currentState.switch1
+        SerReq['switch2'] = Msg.data.infoRspData.currentState.switch2
+        SerReq['switch3'] = Msg.data.infoRspData.currentState.switch3
+        SerReq['switch4'] = Msg.data.infoRspData.currentState.switch4
+        SerReq['switch5'] = Msg.data.infoRspData.currentState.switch5
+        SerReq['switch6'] = Msg.data.infoRspData.currentState.switch6
+        SerReq['switch7'] = Msg.data.infoRspData.currentState.switch7
+        SerReq['switch8'] = Msg.data.infoRspData.currentState.switch8
+        return SerReq
+
+
+
