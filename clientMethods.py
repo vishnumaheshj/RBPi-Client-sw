@@ -37,6 +37,20 @@ def createMessageForServer(Msg):
         SerReq['switch7'] = Msg.data.infoRspData.currentState.switch7
         SerReq['switch8'] = Msg.data.infoRspData.currentState.switch8
         return SerReq
+    elif Msg.hdr.type == SB_STATE_CHANGE_RSP:
+        print ("State Change Rsp")
+        SerReq = {'message_type': SB_STATE_CHANGE_RSP}
+        SerReq['sbType']  = Msg.data.infoRspData.sbType.type
+        SerReq['switch1'] = Msg.data.boardData.switchData.state.switch1
+        SerReq['switch2'] = Msg.data.boardData.switchData.state.switch2
+        SerReq['switch3'] = Msg.data.boardData.switchData.state.switch3
+        SerReq['switch4'] = Msg.data.boardData.switchData.state.switch4
+        SerReq['switch5'] = Msg.data.boardData.switchData.state.switch5
+        SerReq['switch6'] = Msg.data.boardData.switchData.state.switch6
+        SerReq['switch7'] = Msg.data.boardData.switchData.state.switch7
+        SerReq['switch8'] = Msg.data.boardData.switchData.state.switch8
+        return SerReq
+
 
 
 
