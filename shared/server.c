@@ -73,20 +73,20 @@ int read_shm(char *data, int ShmID)
     while (ShmPTR->status != FILLED)
         continue;
 
-	sMsg = (sbMessage_t *)ShmPTR->data;
+    sMsg = (sbMessage_t *)ShmPTR->data;
 
     if (sMsg->hdr.message_type == SB_BOARD_INFO_RSP)
         dataSize = SB_BOARD_INFO_RSP_LEN;
     else if (sMsg->hdr.message_type == SB_STATE_CHANGE_RSP)
         dataSize = SB_STATE_CHANGE_RSP_LEN;
     else
-	    dataSize = 128;
+        dataSize = 128;
 
-     memcpy(data, ShmPTR->data, dataSize);
-     ShmPTR->status = TAKEN;
+    memcpy(data, ShmPTR->data, dataSize);
+    ShmPTR->status = TAKEN;
 
-     shmdt((void *) ShmPTR);
-     return dataSize;
+    shmdt((void *) ShmPTR);
+    return dataSize;
 }
 
 int write_shm(char *data, int ShmID)
