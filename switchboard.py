@@ -6,11 +6,15 @@ SB_BOARD_INFO_RSP   = 0x02
 SB_STATE_CHANGE_REQ = 0x03
 SB_STATE_CHANGE_RSP = 0x04
 
+SB_DEVICE_READY_NTF = 0x05
+
 #Message Lengths
 SB_BOARD_INFO_REQ_LEN   = (2)
 SB_BOARD_INFO_RSP_LEN   = (10)
 SB_STATE_CHANGE_REQ_LEN = (6)
 SB_STATE_CHANGE_RSP_LEN = (6)
+
+SB_DEVICE_READY_NTF     = (2)
 
 class sbMessageHdr_t(Structure):
     _fields_ = [("type", c_ubyte)]
@@ -78,8 +82,12 @@ class sInfoRsp_t(Structure):
     _fields_ = [("sbType", switchBoardType_t),
                 ("currentState", hwSwitchBoardState_t)]
 
+class sDevInfo_t(Structure):
+    _fields_ = [("sbType", switchBoardType_t)]
+
 class sbMessageData_t(Union):
     _fields_ = [("boardData", sBoard_t),
+                ("devInfo", sDevInfo_t),
                 ("infoReqData", sInfoReq_t),
                 ("infoRspData", sInfoRsp_t)]
 

@@ -26,5 +26,9 @@ def processMsgFromClient(clientMessage):
         print ("Info Response received")
     elif clientMessage['message_type'] == SB_STATE_CHANGE_RSP:
         print ("State change Response received")
+    elif clientMessage['message_type'] == SB_DEVICE_READY_NTF:
+        print ("Hub is up and running")
+        print ("Device Type: %i.\n" % clientMessage['sbType'])
+
 
 

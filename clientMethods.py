@@ -1,5 +1,16 @@
 import switchboard
 from switchboard import *
+import ctypes
+
+readId  =  int()
+writeId = int()
+lib = ctypes.cdll.LoadLibrary("./libshm.so")
+
+def writeShm(message):
+    lib.write_shm(byref(message), writeId)
+
+def readShm(message):
+    lib.read_shm(byref(message), readId)
 
 def createMessageForHub(Msg):
     if Msg['message_type'] == SB_BOARD_INFO_REQ:
@@ -50,6 +61,19 @@ def createMessageForServer(Msg):
         SerReq['switch7'] = Msg.data.boardData.switchData.state.switch7
         SerReq['switch8'] = Msg.data.boardData.switchData.state.switch8
         return SerReq
+    elif Msg.hdr.type == SB_DEVICE_READY_NTF:
+        print ("Device Up")
+        SerReq = {'message_type': SB_DEVICE_READY_NTF}
+        SerReq['sbType'] = Msg.data.devInfo.sbType.type
+        return SerReq
+
+def initializeHub():
+    readId = lib.init_read_shm()
+    writeId = lib.init_write_shm()
+    inMsg = sbMessage_t()
+    readShm(inMsg)
+    if inMsg.hdr.type == SB_DEVICE_READY_NTF:
+        return createMessageForServer(inMsg)
 
 
 
