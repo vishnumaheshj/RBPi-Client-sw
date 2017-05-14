@@ -1,5 +1,6 @@
 import switchboard
 from switchboard import *
+import json
 
 def sentBoardInfoReq():
     Msg = {'message_type': SB_BOARD_INFO_REQ}
@@ -18,4 +19,12 @@ def sentStateChangeReq():
     Msg['switch7'] = SW_DONT_CARE
     Msg['switch8'] = SW_DONT_CARE
     return Msg
+
+def processMsgFromClient(clientMessage):
+    clientMessage = json.loads(clientMessage)
+    if clientMessage['message_type'] == SB_BOARD_INFO_RSP:
+        print ("Info Response received")
+    elif clientMessage['message_type'] == SB_STATE_CHANGE_RSP:
+        print ("State change Response received")
+
 
