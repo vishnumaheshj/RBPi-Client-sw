@@ -79,8 +79,14 @@ int read_shm(char *data, int ShmID)
         dataSize = SB_BOARD_INFO_RSP_LEN;
     else if (sMsg->hdr.message_type == SB_STATE_CHANGE_RSP)
         dataSize = SB_STATE_CHANGE_RSP_LEN;
+    else if (sMsg->hdr.message_type == SB_DEVICE_READY_NTF)
+    {
+        dataSize = SB_DEVICE_READY_NTF_LEN;
+    }
     else
+    {
         dataSize = 128;
+    }
 
     memcpy(data, ShmPTR->data, dataSize);
     ShmPTR->status = TAKEN;

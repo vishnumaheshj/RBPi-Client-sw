@@ -26,7 +26,7 @@ class Devhandler(tornado.websocket.WebSocketHandler):
 
     def on_message(self, message):
         print("Message received %s\n" %message)
-        device = dotslash_hub(message, self)
+        device = dotslash_hub("001", self)
         global_devlist.append(device)
         print ("Devices %i" % len(global_devlist))
         serverMethods.processMsgFromClient(message)
