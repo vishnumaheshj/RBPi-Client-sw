@@ -82,12 +82,15 @@ class sInfoRsp_t(Structure):
     _fields_ = [("sbType", switchBoardType_t),
                 ("currentState", hwSwitchBoardState_t)]
 
-class sDevInfo_t(Structure):
-    _fields_ = [("sbType", switchBoardType_t)]
+# Hub Status
+HUB_START_SUCCESS = 0x01
+HUB_START_UNKNOWN = 0x02
+class sHubInfo_t(Structure):
+    _fields_ = [("status", c_ubyte)]
 
 class sbMessageData_t(Union):
     _fields_ = [("boardData", sBoard_t),
-                ("devInfo", sDevInfo_t),
+                ("hubInfo", sHubInfo_t),
                 ("infoReqData", sInfoReq_t),
                 ("infoRspData", sInfoRsp_t)]
 
