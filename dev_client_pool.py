@@ -31,6 +31,7 @@ a = executor.submit(listen_hub)
 @gen.coroutine
 def dev_connect():
     print("$$....dev connect....$$")
+    clientMethods.checkInit()
     global client
     client = yield tornado.websocket.websocket_connect("ws://localhost:8880/dev")
     msg = yield client.read_message()

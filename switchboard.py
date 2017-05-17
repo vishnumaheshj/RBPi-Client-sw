@@ -7,6 +7,7 @@ SB_STATE_CHANGE_REQ = 0x03
 SB_STATE_CHANGE_RSP = 0x04
 
 SB_DEVICE_READY_NTF = 0x05
+SB_DEVICE_READY_REQ = 0x06
 
 #Message Lengths
 SB_BOARD_INFO_REQ_LEN   = (2)
@@ -15,6 +16,7 @@ SB_STATE_CHANGE_REQ_LEN = (6)
 SB_STATE_CHANGE_RSP_LEN = (6)
 
 SB_DEVICE_READY_NTF_LEN = (1)
+SB_DEVICE_READY_REQ_LEN = (1)
 
 class sbMessageHdr_t(Structure):
     _fields_ = [("type", c_ubyte)]

@@ -4,6 +4,8 @@ import ctypes
 
 readId  =  int()
 writeId = int()
+listenThreadEvent = 0
+
 lib = ctypes.cdll.LoadLibrary("./libshm.so")
 
 def writeShm(message):
@@ -69,10 +71,31 @@ def createMessageForServer(Msg):
 def initializeHub():
     global readId
     global writeId
+    global listenThreadEvent
     readId = lib.init_read_shm()
     writeId = lib.init_write_shm()
     inMsg = sbMessage_t()
-    readShm(inMsg)
- 
-    if (inMsg.hdr.type == SB_DEVICE_READY_NTF):
-        return createMessageForServer(inMsg)
+
+    while True:
+        if lib.is_rbuf_ready_nw():
+            readShm(inMsg)
+        else:
+            listenThreadEvent = SB_DEVICE_READY_REQ
+
+        if (inMsg.hdr.type == SB_DEVICE_READY_NTF):
+            listenThreadEvent = None
+            return createMessageForServer(inMsg)
+        else:
+            listenThreadEvent = SB_DEVICE_READY_REQ
+
+
+def sendDeviceReq(req):
+    inMsg = sbMessage_t()
+    inMsg.hdr.type = req
+    writeShm(inMsg)
+
+def checkInit():
+    while(listenThreadEvent == 0):
+        continue
+    if listenThreadEvent == SB_DEVICE_READY_REQ:
+        sendDeviceReq(SB_DEVICE_READY_REQ)
