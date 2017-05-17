@@ -14,7 +14,7 @@ SB_BOARD_INFO_RSP_LEN   = (10)
 SB_STATE_CHANGE_REQ_LEN = (6)
 SB_STATE_CHANGE_RSP_LEN = (6)
 
-SB_DEVICE_READY_NTF_LEN = (2)
+SB_DEVICE_READY_NTF_LEN = (1)
 
 class sbMessageHdr_t(Structure):
     _fields_ = [("type", c_ubyte)]
@@ -82,15 +82,8 @@ class sInfoRsp_t(Structure):
     _fields_ = [("sbType", switchBoardType_t),
                 ("currentState", hwSwitchBoardState_t)]
 
-# Hub Status
-HUB_START_SUCCESS = 0x01
-HUB_START_UNKNOWN = 0x02
-class sHubInfo_t(Structure):
-    _fields_ = [("status", c_ubyte)]
-
 class sbMessageData_t(Union):
     _fields_ = [("boardData", sBoard_t),
-                ("hubInfo", sHubInfo_t),
                 ("infoReqData", sInfoReq_t),
                 ("infoRspData", sInfoRsp_t)]
 

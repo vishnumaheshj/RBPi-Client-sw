@@ -62,9 +62,8 @@ def createMessageForServer(Msg):
         SerReq['switch8'] = Msg.data.boardData.switchData.state.switch8
         return SerReq
     elif Msg.hdr.type == SB_DEVICE_READY_NTF:
-        print ("Device Up notification")
+        print("Device Up notification")
         SerReq = {'message_type': SB_DEVICE_READY_NTF}
-        SerReq['status'] = Msg.data.hubInfo.status
         return SerReq
 
 def initializeHub():
@@ -73,7 +72,6 @@ def initializeHub():
     readId = lib.init_read_shm()
     writeId = lib.init_write_shm()
     inMsg = sbMessage_t()
-
     readShm(inMsg)
  
     if (inMsg.hdr.type == SB_DEVICE_READY_NTF):

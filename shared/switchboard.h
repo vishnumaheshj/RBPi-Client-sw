@@ -96,9 +96,24 @@ typedef struct
   hwSwitchBoardState_t currentState;
 } sInfoRsp_t;
 
+// Hub Status
+#define HUB_START_SUCCESS 0x01
+#define HUB_START_UNKNOWN 0x02
 typedef struct
 {
-	switchBoardType_t sbType;
+	uint8 status;
+} sHubInfo_t;
+
+// Device join states
+#define DJ_NEW_DEVICE     0x01
+#define DJ_KNOWN_DEVICE   0x02
+typedef struct
+{
+	uint8 joinState;
+	switchBoardType_t type;
+	uint8 devIndex;
+	unsigned long int ieeeAddr;
+	uint8 epStatus;
 } sDevInfo_t;
 
 typedef struct
@@ -109,6 +124,7 @@ typedef struct
     sBoard_t boardData;
     sInfoReq_t infoReqData;
     sInfoRsp_t infoRspData;
+    sHubInfo_t hubInfo;
     sDevInfo_t devInfo;
   } data;
 } sbMessage_t;
