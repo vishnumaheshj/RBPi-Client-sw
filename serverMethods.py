@@ -2,6 +2,15 @@ import switchboard
 from switchboard import *
 import json
 
+global_devlist = []
+global_num_devices = 0
+
+class dotslash_hub:
+    def __init__(self,a,b):
+        self.id = a
+        self.conn = b
+
+
 def sentBoardInfoReq():
     Msg = {'message_type': SB_BOARD_INFO_REQ}
     Msg['flags'] = 0
@@ -20,7 +29,7 @@ def sentStateChangeReq():
     Msg['switch8'] = SW_DONT_CARE
     return Msg
 
-def processMsgFromClient(clientMessage):
+def processMsgFromClient(connection, clientMessage):
     clientMessage = json.loads(clientMessage)
     if clientMessage['message_type'] == SB_BOARD_INFO_RSP:
         print ("Info Response received")
@@ -28,7 +37,11 @@ def processMsgFromClient(clientMessage):
         print ("State change Response received")
     elif clientMessage['message_type'] == SB_DEVICE_READY_NTF:
         print ("Hub is up and running")
-
+        global_num_devices =  1
+        if global_num_devices not in [hub.id for hub in global_devlist]:
+            device = dotslash_hub(global_num_devices, connection)
+            global_devlist.append(device)
+        print ("Total Devices %i" % len(global_devlist))
 
 
 

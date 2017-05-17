@@ -6,14 +6,8 @@ import tornado.websocket
 import tornado.ioloop
 import tornado.web
 import serverMethods
-#from serverMethods import *
+from serverMethods import global_devlist
 
-global_devlist = []
-
-class dotslash_hub:
-    def __init__(self,a,b):
-        self.id = a
-        self.conn = b
 
 class Mainhandler(tornado.web.RequestHandler):
     def get(self):
@@ -26,10 +20,7 @@ class Devhandler(tornado.websocket.WebSocketHandler):
 
     def on_message(self, message):
         print("Message received %s\n" %message)
-        device = dotslash_hub("001", self)
-        global_devlist.append(device)
-        print ("Devices %i" % len(global_devlist))
-        serverMethods.processMsgFromClient(message)
+        serverMethods.processMsgFromClient(self, message)
 
 
     def on_close(self):
@@ -46,7 +37,7 @@ class Userhandler(tornado.web.RequestHandler):
         print("Id %s\n" %devid)
         found = 0
         for device in global_devlist:
-            if(device.id == devid):
+            if(device.id == int(devid)):
                 if (message[:4] == "cmd0"):
                     Msg = serverMethods.sentBoardInfoReq()
                     device.conn.write_message(Msg)

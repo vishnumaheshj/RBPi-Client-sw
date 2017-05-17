@@ -9,7 +9,7 @@
 		<h3>
 			Active Devices : 
 			{% for device in devices %}
-			<li>{{ escape(device.id) }}</li>
+			<li>{{ escape(str(device.id)) }}</li>
 			{% end %}
 		</h3>
 
