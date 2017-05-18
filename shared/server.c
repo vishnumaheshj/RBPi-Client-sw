@@ -20,63 +20,146 @@
 #include  <sys/shm.h>
 #include  <unistd.h>
 #include  <string.h>
+#include "switchboard.h"
 
 #define  NOT_READY  -1
-#define  FILLED     0
-#define  TAKEN      1
+#define  FILLED     1
+#define  TAKEN      0
 
 struct Memory {
 	int  status;
-	char data[50];
+	char data[256];
 };
 
-int init_shm()
+int init_write_shm()
 {
-     key_t          ShmKEY;
-     int            ShmID = -1;
+    key_t          ShmKEY;
+    int            ShmID = -1;
+    struct Memory *ShmPTR;
 
-     ShmKEY = ftok("/home", 'x');
-     ShmID = shmget(ShmKEY, sizeof(struct Memory), IPC_CREAT | 0666);
+    ShmKEY = ftok("/home", 'a');
+    ShmID = shmget(ShmKEY, sizeof(struct Memory), IPC_CREAT | 0666);
 
-     return ShmID;
+    ShmPTR = (struct Memory *) shmat(ShmID, NULL, 0);
+    memset(ShmPTR, NOT_READY, 256);
+    shmdt((void *) ShmPTR);
+
+    return ShmID;
 }
 
-int update_shm(char *data, int ShmID)
+int init_read_shm()
 {
-     struct Memory  *ShmPTR;
-     ShmPTR = (struct Memory *) shmat(ShmID, NULL, 0);
-	
+    key_t          ShmKEY;
+    int            ShmID = -1;
 
-     if (ShmPTR == NULL)
-	     return -1;
+    ShmKEY = ftok("/home", 'b');
+    ShmID = shmget(ShmKEY, sizeof(struct Memory), IPC_CREAT | 0666);
 
-     memset(ShmPTR->data, 0, 50);
-     //fprintf(stdout, "Data %s\n", ShmPTR->data);
-     memcpy(ShmPTR->data, data, strlen(data));
-     //fprintf(stdout, "Data %s\n", ShmPTR->data);
-     ShmPTR->status = FILLED;
-
-     shmdt((void *) ShmPTR);
-     return 0;
+    return ShmID;
 }
+
+int is_rbuf_ready_nw(int ShmID)
+{
+    int ret;
+    struct Memory  *ShmPTR;
+
+    ShmPTR = (struct Memory *) shmat(ShmID, NULL, 0);
+    if (ShmPTR == NULL)
+    {
+	    ret = 0;
+    }
+	else if (ShmPTR->status == FILLED)
+    {
+	    ret = 1;
+    }
+	else
+    {
+	    ret = 0;
+    }
+
+	shmdt((void *) ShmPTR);
+
+	return ret;
+}
+
+int read_shm(char *data, int ShmID)
+{
+    int dataSize;
+    struct Memory  *ShmPTR;
+    sbMessage_t *sMsg;
+
+    ShmPTR = (struct Memory *) shmat(ShmID, NULL, 0);
+
+    if (ShmPTR == NULL)
+	    return -1;
+
+    while (ShmPTR->status != FILLED)
+        continue;
+
+    sMsg = (sbMessage_t *)ShmPTR->data;
+
+    if (sMsg->hdr.message_type == SB_BOARD_INFO_RSP)
+        dataSize = SB_BOARD_INFO_RSP_LEN;
+    else if (sMsg->hdr.message_type == SB_STATE_CHANGE_RSP)
+        dataSize = SB_STATE_CHANGE_RSP_LEN;
+    else if (sMsg->hdr.message_type == SB_DEVICE_READY_NTF)
+        dataSize = SB_DEVICE_READY_NTF_LEN;
+    else
+        dataSize = 128;
+
+    memcpy(data, ShmPTR->data, dataSize);
+    ShmPTR->status = TAKEN;
+
+    shmdt((void *) ShmPTR);
+    return dataSize;
+}
+
+int write_shm(char *data, int ShmID)
+{
+    int dataSize;
+    sbMessage_t *sMsg = (sbMessage_t *)data;
+    struct Memory  *ShmPTR;
+
+    ShmPTR = (struct Memory *) shmat(ShmID, NULL, 0);
+
+    if (ShmPTR == NULL)
+	    return -1;
+
+    if (sMsg->hdr.message_type == SB_BOARD_INFO_REQ)
+        dataSize = SB_BOARD_INFO_REQ_LEN;
+    else if (sMsg->hdr.message_type == SB_STATE_CHANGE_REQ)
+        dataSize = SB_STATE_CHANGE_REQ_LEN;
+    else if (sMsg->hdr.message_type == SB_DEVICE_READY_REQ)
+        dataSize = SB_DEVICE_READY_REQ_LEN;
+    else
+	    dataSize = 128;
+
+    memset(ShmPTR->data, 0, 256);
+    memcpy(ShmPTR->data, data, dataSize);
+    ShmPTR->status = FILLED;
+
+    shmdt((void *) ShmPTR);
+    return dataSize;
+}
+
 
 int delete_shm(int ShmID)
 {
-
-     shmctl(ShmID, IPC_RMID, NULL);
+    shmctl(ShmID, IPC_RMID, NULL);
+    return 0;
 }
 
 
 #if 0
 void  main(int  argc, char *argv[])
 {
-	int id; 
+    int id;
 
-	id = init_shm();
+    id = init_shm();
 
-	update_shm(argv[1], id);
+    update_shm(argv[1], id);
 
-	while(1)
-		continue;
+    while(1)
+        continue;
 }
 #endif
