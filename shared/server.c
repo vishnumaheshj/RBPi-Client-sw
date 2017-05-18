@@ -61,18 +61,27 @@ int init_read_shm()
 int is_rbuf_ready_nw(int ShmID)
 {
     int ret;
+    struct Memory  *ShmPTR;
+
     ShmPTR = (struct Memory *) shmat(ShmID, NULL, 0);
     if (ShmPTR == NULL)
+    {
 	    ret = 0;
+    }
 	else if (ShmPTR->status == FILLED)
+    {
 	    ret = 1;
+    }
 	else
+    {
 	    ret = 0;
+    }
 
 	shmdt((void *) ShmPTR);
 
 	return ret;
 }
+
 int read_shm(char *data, int ShmID)
 {
     int dataSize;
@@ -120,6 +129,8 @@ int write_shm(char *data, int ShmID)
         dataSize = SB_BOARD_INFO_REQ_LEN;
     else if (sMsg->hdr.message_type == SB_STATE_CHANGE_REQ)
         dataSize = SB_STATE_CHANGE_REQ_LEN;
+    else if (sMsg->hdr.message_type == SB_DEVICE_READY_REQ)
+        dataSize = SB_DEVICE_READY_REQ_LEN;
     else
 	    dataSize = 128;
 

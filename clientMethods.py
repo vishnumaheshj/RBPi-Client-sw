@@ -77,7 +77,7 @@ def initializeHub():
     inMsg = sbMessage_t()
 
     while True:
-        if lib.is_rbuf_ready_nw():
+        if lib.is_rbuf_ready_nw(readId):
             readShm(inMsg)
         else:
             listenThreadEvent = SB_DEVICE_READY_REQ

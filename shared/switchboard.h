@@ -9,6 +9,7 @@ typedef unsigned char uint8;
 #define SB_STATE_CHANGE_RSP 0x04
 
 #define SB_DEVICE_READY_NTF 0x05
+#define SB_DEVICE_READY_REQ 0x06
 
 //Message Lengths
 #define SB_BOARD_INFO_REQ_LEN   (2)
@@ -16,7 +17,8 @@ typedef unsigned char uint8;
 #define SB_STATE_CHANGE_REQ_LEN (6) 
 #define SB_STATE_CHANGE_RSP_LEN (6)
 
-#define SB_DEVICE_READY_NTF_LEN (2)
+#define SB_DEVICE_READY_NTF_LEN (1)
+#define SB_DEVICE_READY_REQ_LEN (1)
 
 typedef struct
 {
@@ -96,14 +98,6 @@ typedef struct
   hwSwitchBoardState_t currentState;
 } sInfoRsp_t;
 
-// Hub Status
-#define HUB_START_SUCCESS 0x01
-#define HUB_START_UNKNOWN 0x02
-typedef struct
-{
-	uint8 status;
-} sHubInfo_t;
-
 // Device join states
 #define DJ_NEW_DEVICE     0x01
 #define DJ_KNOWN_DEVICE   0x02
@@ -124,7 +118,6 @@ typedef struct
     sBoard_t boardData;
     sInfoReq_t infoReqData;
     sInfoRsp_t infoRspData;
-    sHubInfo_t hubInfo;
     sDevInfo_t devInfo;
   } data;
 } sbMessage_t;
