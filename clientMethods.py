@@ -67,6 +67,27 @@ def createMessageForServer(Msg):
         print("Device Up notification")
         SerReq = {'message_type': SB_DEVICE_READY_NTF}
         return SerReq
+    elif Msg.hdr.type == SB_DEVICE_INFO_NTF:
+        print("Device Info NTF");
+        SerReq = {'message_type': SB_DEVICE_INFO_NTF}
+        SerReq['joinState'] = Msg.data.devInfo.joinState
+        SerReq['sbType']    = Msg.data.devInfo.sbType.type
+        SerReq['devIndex']  = Msg.data.devInfo.devIndex
+        SerReq['ieeeAddr']  = Msg.data.devInfo.ieeeAddr
+        SerReq['epStatus']  = Msg.data.devInfo.epStatus
+        SerReq['switch1']   = Msg.data.devInfo.currentState.switch1
+        SerReq['switch2']   = Msg.data.devInfo.currentState.switch2
+        SerReq['switch3']   = Msg.data.devInfo.currentState.switch3
+        SerReq['switch4']   = Msg.data.devInfo.currentState.switch4
+        SerReq['switch5']   = Msg.data.devInfo.currentState.switch5
+        SerReq['switch6']   = Msg.data.devInfo.currentState.switch6
+        SerReq['switch7']   = Msg.data.devInfo.currentState.switch7
+        SerReq['switch8']   = Msg.data.devInfo.currentState.switch8
+        return SerReq
+    else:
+        print("Unknown message")
+        return {}
+
 
 def initializeHub():
     global readId
