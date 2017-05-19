@@ -93,24 +93,40 @@ int read_shm(char *data, int ShmID)
     if (ShmPTR == NULL)
 	    return -1;
 
+    printf("r:waiting to be filled filled\n");
     while (ShmPTR->status != FILLED)
         continue;
+    printf("r:message filled\n");
 
     sMsg = (sbMessage_t *)ShmPTR->data;
 
     if (sMsg->hdr.message_type == SB_BOARD_INFO_RSP)
+    {
+        printf("r:board info rsp\n");
         dataSize = SB_BOARD_INFO_RSP_LEN;
+    }
     else if (sMsg->hdr.message_type == SB_STATE_CHANGE_RSP)
+    {
+        printf("r:state change rsp\n");
         dataSize = SB_STATE_CHANGE_RSP_LEN;
+    }
     else if (sMsg->hdr.message_type == SB_DEVICE_READY_NTF)
+    {
+        printf("r:device ready notification\n");
         dataSize = SB_DEVICE_READY_NTF_LEN;
+    }
     else if (sMsg->hdr.message_type == SB_DEVICE_INFO_NTF)
     {
         dataSize = SB_DEVICE_INFO_NTF_LEN;
-	printf("Got dev info message.");
+	    printf("r:dev info message.\n");
+        printf("r:sizeof sMsg:%d\n", sizeof(sbMessage_t));
+        printf("r:ieee addr:%llx\n", sMsg->data.devInfo.ieeeAddr);
     }
     else
+    {
+        printf("r:unknown message\n");
         dataSize = 128;
+    }
 
     memcpy(data, ShmPTR->data, dataSize);
     ShmPTR->status = TAKEN;
@@ -131,13 +147,25 @@ int write_shm(char *data, int ShmID)
 	    return -1;
 
     if (sMsg->hdr.message_type == SB_BOARD_INFO_REQ)
+    {
+        printf("board info req\n");
         dataSize = SB_BOARD_INFO_REQ_LEN;
+    }
     else if (sMsg->hdr.message_type == SB_STATE_CHANGE_REQ)
+    {
+        printf("w:state change req\n");
         dataSize = SB_STATE_CHANGE_REQ_LEN;
+    }
     else if (sMsg->hdr.message_type == SB_DEVICE_READY_REQ)
+    {
+        printf("w:device ready req\n");
         dataSize = SB_DEVICE_READY_REQ_LEN;
+    }
     else
+    {
+        printf("w:unknown message\n");
 	    dataSize = 128;
+    }
 
     memset(ShmPTR->data, 0, 256);
     memcpy(ShmPTR->data, data, dataSize);

@@ -15,7 +15,7 @@ def listen_hub():
             continue
     print("listenHub:clientHandle Ready")
     client.write_message(json.dumps(serReq))
-    print("listenHub:Sent Device Ready..!!!!!@~~~~~~")
+    print("listenHub:Sent Device Ready..")
     while True:
         clientMethods.readShm(inMsg)
         print("listenHub:new message")
@@ -35,14 +35,14 @@ def dev_connect():
     global client
     client = yield tornado.websocket.websocket_connect("ws://localhost:8880/dev")
     msg = yield client.read_message()
-    print("From dev connect:%s" % msg)
+    print("From server:%s" % msg)
     while 1:
         msg = yield client.read_message()
-        print("From dev connect:%s" % msg)
+        print("msg from server:%s" % msg)
         Msg = json.loads(msg)
         Req = clientMethods.createMessageForHub(Msg)
         clientMethods.writeShm(Req)
-        print("From dev connect: send to hub")
+        print("msg from server: send to hub")
         continue
     client.close()
 
