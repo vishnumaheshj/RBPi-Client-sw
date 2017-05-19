@@ -75,7 +75,6 @@ def initializeHub():
     readId = lib.init_read_shm()
     writeId = lib.init_write_shm()
     inMsg = sbMessage_t()
-
     while True:
         if lib.is_rbuf_ready_nw(readId):
             readShm(inMsg)

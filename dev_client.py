@@ -18,13 +18,14 @@ def execute_binary():
     binary = subprocess.Popen("./dataSendRcv.bin", stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     while binary.poll() is None:
         line =  binary.stdout.readline()
+	print("dataSendRcv.bin : %s" %line)
         if line != '':
             if "Error" in line:
                 print(line)
                 binary_init_status = -1
                 binary.terminate()
                 break
-            if "Enter message" in line:
+            if "Done" in line:
                 binary_init_status = 1
 
 def listen_hub():
@@ -45,17 +46,18 @@ def listen_hub():
         print("listenHub:send message")
         continue 
 
-#executor = concurrent.futures.ThreadPoolExecutor(max_workers=1)
-#a = executor.submit(listen_hub)
-
-
 @gen.coroutine
 def dev_connect():
+    thread = Thread(target = listen_hub)
+    thread.daemon = True
+    thread.start()
+
     #Execute dataSendRcv binary on separate thread
     thread = Thread(target = execute_binary)
     thread.daemon = True
     thread.start()
     print("Initializing ZNP")
+    global binary_init_status
     while binary_init_status== 0:
         continue
     if binary_init_status== -1:
@@ -64,9 +66,6 @@ def dev_connect():
     else:
         print("ZNP init success, connecting to server")
 
-    thread = Thread(target = listen_hub)
-    thread.daemon = True
-    thread.start()
     
     print("$$....dev connect....$$")
     clientMethods.checkInit()
