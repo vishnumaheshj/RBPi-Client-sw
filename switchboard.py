@@ -9,6 +9,10 @@ SB_STATE_CHANGE_RSP = 0x04
 SB_DEVICE_READY_NTF = 0x05
 SB_DEVICE_READY_REQ = 0x06
 
+SB_DEVICE_TYPE_REQ  = 0x07
+SB_DEVICE_TYPE_NTF  = 0x08
+SB_DEVICE_INFO_NTF  = 0x09
+
 #Message Lengths
 SB_BOARD_INFO_REQ_LEN   = (2)
 SB_BOARD_INFO_RSP_LEN   = (10)
@@ -17,6 +21,9 @@ SB_STATE_CHANGE_RSP_LEN = (6)
 
 SB_DEVICE_READY_NTF_LEN = (1)
 SB_DEVICE_READY_REQ_LEN = (1)
+SB_DEVICE_TYPE_REQ_LEN  = (1)
+SB_DEVICE_TYPE_NTF_LEN  = (1)
+SB_DEVICE_INFO_NTF_LEN  = (40)
 
 class sbMessageHdr_t(Structure):
     _fields_ = [("type", c_ubyte)]
@@ -83,11 +90,19 @@ class sInfoReq_t(Structure):
 class sInfoRsp_t(Structure):
     _fields_ = [("sbType", switchBoardType_t),
                 ("currentState", hwSwitchBoardState_t)]
+class sDevInfo_t(Structure):
+    _fields_ = [("joinState", c_ubyte),
+                ("sbType", switchBoardType_t),
+                ("devIndex", c_ubyte),
+				("ieeeAddr", c_ulonglong),
+                ("epStatus", c_ubyte),
+                ("currentState", hwSwitchBoardState_t)]
 
 class sbMessageData_t(Union):
     _fields_ = [("boardData", sBoard_t),
                 ("infoReqData", sInfoReq_t),
-                ("infoRspData", sInfoRsp_t)]
+                ("infoRspData", sInfoRsp_t),
+                ("devInfo", sDevInfo_t)]
 
 class sbMessage_t(Structure):
     _fields_ = [("hdr", sbMessageHdr_t),
