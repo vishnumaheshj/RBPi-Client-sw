@@ -69,7 +69,7 @@ def createMessageForServer(Msg):
         return SerReq
     elif Msg.hdr.type == SB_DEVICE_INFO_NTF:
         print("Device Info notification")
-        print("size of msg:%i" % sizeof(sbMessage_t))
+        print("PYTHON:::size of msg:%i" % sizeof(sbMessage_t))
         SerReq = {'message_type': SB_DEVICE_INFO_NTF}
         SerReq['joinState'] = Msg.data.devInfo.joinState
         SerReq['sbType']    = Msg.data.devInfo.sbType.type

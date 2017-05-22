@@ -22,7 +22,7 @@ SB_STATE_CHANGE_RSP_LEN = (6)
 SB_DEVICE_READY_NTF_LEN = (1)
 SB_DEVICE_READY_REQ_LEN = (1)
 SB_DEVICE_TYPE_REQ_LEN  = (1)
-SB_DEVICE_TYPE_NTF_LEN  = (1)
+SB_DEVICE_TYPE_NTF_LEN  = (13)
 SB_DEVICE_INFO_NTF_LEN  = (40)
 
 class sbMessageHdr_t(Structure):
@@ -94,7 +94,7 @@ class sDevInfo_t(Structure):
     _fields_ = [("joinState", c_ubyte),
                 ("sbType", switchBoardType_t),
                 ("devIndex", c_ubyte),
-				("ieeeAddr", c_ulonglong),
+                ("ieeeAddr", c_ulonglong),
                 ("epStatus", c_ubyte),
                 ("currentState", hwSwitchBoardState_t)]
 
