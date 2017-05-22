@@ -103,12 +103,12 @@ int read_shm(char *data, int ShmID)
     if (sMsg->hdr.message_type == SB_BOARD_INFO_RSP)
     {
         printf("r:board info rsp\n");
-        dataSize = SB_BOARD_INFO_RSP_LEN;
+        dataSize = 40;
     }
     else if (sMsg->hdr.message_type == SB_STATE_CHANGE_RSP)
     {
         printf("r:state change rsp\n");
-        dataSize = SB_STATE_CHANGE_RSP_LEN;
+        dataSize = 40;
     }
     else if (sMsg->hdr.message_type == SB_DEVICE_READY_NTF)
     {
@@ -119,8 +119,22 @@ int read_shm(char *data, int ShmID)
     {
         dataSize = SB_DEVICE_INFO_NTF_LEN;
 	    printf("r:dev info message.\n");
-        printf("r:sizeof sMsg:%d\n", sizeof(sbMessage_t));
-        printf("r:ieee addr:%llx\n", sMsg->data.devInfo.ieeeAddr);
+        printf("C:::r:sizeof sMsg:%d\n", sizeof(sbMessage_t));
+		
+        printf("r: message type:%x\n", sMsg->hdr.message_type);
+        printf("r: join state  :%x\n", sMsg->data.devInfo.joinState);
+        printf("r: sbType      :%x\n", sMsg->data.devInfo.sbType.type);
+        printf("r: dev index   :%x\n", sMsg->data.devInfo.devIndex);
+        printf("r: ieee addr   :%llx\n", sMsg->data.devInfo.ieeeAddr);
+        printf("r: ep status   :%x\n", sMsg->data.devInfo.epStatus);
+        printf("r: switch1     :%x\n", sMsg->data.devInfo.currentState.switch1);
+        printf("r: switch2     :%x\n", sMsg->data.devInfo.currentState.switch2);
+        printf("r: switch3     :%x\n", sMsg->data.devInfo.currentState.switch3);
+        printf("r: switch4     :%x\n", sMsg->data.devInfo.currentState.switch4);
+        printf("r: switch5     :%x\n", sMsg->data.devInfo.currentState.switch5);
+        printf("r: switch6     :%x\n", sMsg->data.devInfo.currentState.switch6);
+        printf("r: switch7     :%x\n", sMsg->data.devInfo.currentState.switch7);
+        printf("r: switch8     :%x\n", sMsg->data.devInfo.currentState.switch8);
     }
     else
     {

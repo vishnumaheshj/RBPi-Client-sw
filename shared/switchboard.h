@@ -23,8 +23,8 @@ typedef unsigned char uint8;
 #define SB_DEVICE_READY_NTF_LEN (1)
 #define SB_DEVICE_READY_REQ_LEN (1)
 #define SB_DEVICE_TYPE_REQ_LEN  (1)
-#define SB_DEVICE_TYPE_NTF_LEN  (1)
-#define SB_DEVICE_INFO_NTF_LEN  (32)
+#define SB_DEVICE_TYPE_NTF_LEN  (13)
+#define SB_DEVICE_INFO_NTF_LEN  (40)
 
 typedef struct
 {
@@ -117,12 +117,12 @@ typedef struct
 
 typedef struct
 {
-	unsigned long int ieeeAddr;
-	hwSwitchBoardState_t currentState;
 	uint8 joinState;
 	switchBoardType_t sbType;
 	uint8 devIndex;
+	unsigned long int ieeeAddr;
 	uint8 epStatus;
+	hwSwitchBoardState_t currentState;
 } sDevInfo_t;
 
 typedef struct
