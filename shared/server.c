@@ -168,7 +168,7 @@ int write_shm(char *data, int ShmID)
     else if (sMsg->hdr.message_type == SB_STATE_CHANGE_REQ)
     {
         printf("w:state change req\n");
-        dataSize = SB_STATE_CHANGE_REQ_LEN;
+        dataSize = 40;
     }
     else if (sMsg->hdr.message_type == SB_DEVICE_READY_REQ)
     {
