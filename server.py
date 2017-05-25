@@ -32,6 +32,7 @@ class Devhandler(tornado.websocket.WebSocketHandler):
 class Userhandler(tornado.web.RequestHandler):
     def post(self):
         devid = self.get_argument('device', '')
+        nodeid = self.get_argument('node', '')
         message = self.get_argument('message', '')
         print("Message from user %s" %message)
         print("Id %s\n" %devid)
@@ -39,7 +40,7 @@ class Userhandler(tornado.web.RequestHandler):
         for device in global_devlist:
             if(device.id == int(devid)):
                 if (message[:4] == "cmd0"):
-                    Msg = serverMethods.sentBoardInfoReq()
+                    Msg = serverMethods.sentBoardInfoReq(nodeid)
                     device.conn.write_message(Msg)
                 elif (message[:4] == "cmd1"):
                     Msg = serverMethods.sentStateChangeReq()

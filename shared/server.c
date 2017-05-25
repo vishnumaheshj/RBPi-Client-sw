@@ -100,24 +100,22 @@ int read_shm(char *data, int ShmID)
 
     sMsg = (sbMessage_t *)ShmPTR->data;
 
+	dataSize = sizeof(sbMessage_t);
+
     if (sMsg->hdr.message_type == SB_BOARD_INFO_RSP)
     {
         printf("r:board info rsp\n");
-        dataSize = 40;
     }
     else if (sMsg->hdr.message_type == SB_STATE_CHANGE_RSP)
     {
         printf("r:state change rsp\n");
-        dataSize = 40;
     }
     else if (sMsg->hdr.message_type == SB_DEVICE_READY_NTF)
     {
         printf("r:device ready notification\n");
-        dataSize = SB_DEVICE_READY_NTF_LEN;
     }
     else if (sMsg->hdr.message_type == SB_DEVICE_INFO_NTF)
     {
-        dataSize = SB_DEVICE_INFO_NTF_LEN;
 	    printf("r:dev info message.\n");
         printf("C:::r:sizeof sMsg:%d\n", sizeof(sbMessage_t));
 		
@@ -139,7 +137,6 @@ int read_shm(char *data, int ShmID)
     else
     {
         printf("r:unknown message\n");
-        dataSize = 128;
     }
 
     memcpy(data, ShmPTR->data, dataSize);
@@ -160,25 +157,22 @@ int write_shm(char *data, int ShmID)
     if (ShmPTR == NULL)
 	    return -1;
 
+	dataSize = sizeof(sbMessage_t);
     if (sMsg->hdr.message_type == SB_BOARD_INFO_REQ)
     {
         printf("board info req\n");
-        dataSize = SB_BOARD_INFO_REQ_LEN;
     }
     else if (sMsg->hdr.message_type == SB_STATE_CHANGE_REQ)
     {
         printf("w:state change req\n");
-        dataSize = 40;
     }
     else if (sMsg->hdr.message_type == SB_DEVICE_READY_REQ)
     {
         printf("w:device ready req\n");
-        dataSize = SB_DEVICE_READY_REQ_LEN;
     }
     else
     {
         printf("w:unknown message\n");
-	    dataSize = 128;
     }
 
     memset(ShmPTR->data, 0, 256);

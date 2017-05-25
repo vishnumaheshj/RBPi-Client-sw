@@ -13,20 +13,9 @@ SB_DEVICE_TYPE_REQ  = 0x07
 SB_DEVICE_TYPE_NTF  = 0x08
 SB_DEVICE_INFO_NTF  = 0x09
 
-#Message Lengths
-SB_BOARD_INFO_REQ_LEN   = (2)
-SB_BOARD_INFO_RSP_LEN   = (10)
-SB_STATE_CHANGE_REQ_LEN = (6)
-SB_STATE_CHANGE_RSP_LEN = (6)
-
-SB_DEVICE_READY_NTF_LEN = (1)
-SB_DEVICE_READY_REQ_LEN = (1)
-SB_DEVICE_TYPE_REQ_LEN  = (1)
-SB_DEVICE_TYPE_NTF_LEN  = (13)
-SB_DEVICE_INFO_NTF_LEN  = (40)
-
 class sbMessageHdr_t(Structure):
-    _fields_ = [("type", c_ubyte)]
+    _fields_ = [("type", c_ubyte),
+                ("nodeid",c_ubyte)]
 
 # Switch Board Types
 SB_TYPE_PLUG  = 0x01

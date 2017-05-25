@@ -22,8 +22,9 @@ class switch_node:
         
 
 
-def sentBoardInfoReq():
+def sentBoardInfoReq(nodeid):
     Msg = {'message_type': SB_BOARD_INFO_REQ}
+    Msg['node'] = nodeid
     Msg['flags'] = 0
     return Msg
 

@@ -19,6 +19,7 @@ def createMessageForHub(Msg):
         print ("Info Req")
         HubReq = sbMessage_t()
         HubReq.hdr.type = SB_BOARD_INFO_REQ
+        HubReq.hdr.nodeid = int(Msg['node'])
         HubReq.data.infoReqData.flags = 0
         return HubReq
     elif Msg['message_type'] == SB_STATE_CHANGE_REQ:
