@@ -6,12 +6,29 @@
 	<body>
 		<h1> DOTSLASH INC </h1>
 		<h2> Accelerating Present </h2>
-		<h3>
-			Active Devices : 
+		<h3>Active Devices</h3>
+		<h4>Hub id :
 			{% for device in devices %}
 			<li>{{ escape(str(device.id)) }}</li>
 			{% end %}
-		</h3>
+		</h4>
+		<h5> Nodes: </h5>
+			{% for device in devices %}
+				{% for node in device.nodes %}
+				<h5><li>ID : {{ escape(str(node.id)) }}</li>
+					{% if node.type== 0x2%}
+						<li>{{ escape("4 port switch") }}</li>
+						<li> switch 1:{%if node.switch1==0 %} {{ escape("OFF")}} {% else %} {{ escape("ON")}} {% end %}</li>
+						<li> switch 2:{%if node.switch2==0 %} {{ escape("OFF")}} {% else %} {{ escape("ON")}} {% end %}</li>
+						<li> switch 3:{%if node.switch3==0 %} {{ escape("OFF")}} {% else %} {{ escape("ON")}} {% end %}</li>
+						<li> switch 4:{%if node.switch4==0 %} {{ escape("OFF")}} {% else %} {{ escape("ON")}} {% end %}</li>
+					{% else %}
+						<li>{{ escape("Unknown type") }}</li>
+					{% end %}
+							
+				</h5>
+				{% end %}
+			{% end %}
 
 		<div id="input">
 			<form action="/user" method="post" id="user_msg">

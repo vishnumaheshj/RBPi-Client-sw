@@ -9,6 +9,17 @@ class dotslash_hub:
     def __init__(self,a,b):
         self.id = a
         self.conn = b
+        self.nodes = []
+
+class switch_node:
+    def __init__(self, id, type, a, b, c, d):
+        self.id = id
+        self.type = type
+        self.switch1 = a
+        self.switch2 = b
+        self.switch3 = c
+        self.switch4 = d
+        
 
 
 def sentBoardInfoReq():
@@ -42,6 +53,21 @@ def processMsgFromClient(connection, clientMessage):
             device = dotslash_hub(global_num_devices, connection)
             global_devlist.append(device)
         print ("Total Devices %i" % len(global_devlist))
+    elif clientMessage['message_type'] == SB_DEVICE_INFO_NTF:
+        if clientMessage['sbType'] == SB_TYPE_4X4:
+            id = clientMessage['devIndex']
+            type = clientMessage['sbType']
+            switch1 = clientMessage['switch1']
+            switch2 = clientMessage['switch2']
+            switch3 = clientMessage['switch3']
+            switch4 = clientMessage['switch4']
+            node = switch_node(id, type, switch1, switch2, switch3, switch4)
+            for device in global_devlist:
+                if(device.conn == connection):
+                    device.nodes.append(node)
+            print("Received node info switch 4*4")
+        else:
+            print("Received node info unknown device")
 
 
 
