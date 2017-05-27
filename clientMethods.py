@@ -74,7 +74,7 @@ def createMessageForServer(Msg):
         SerReq['joinState'] = Msg.data.devInfo.joinState
         SerReq['sbType']    = Msg.data.devInfo.sbType.type
         SerReq['devIndex']  = Msg.data.devInfo.devIndex
-        SerReq['ieeeAddr']  = Msg.data.devInfo.ieeeAddr
+        SerReq['hubAddr']   = 0x0102030405060708
         SerReq['epStatus']  = Msg.data.devInfo.epStatus
         SerReq['switch1']   = Msg.data.devInfo.currentState.switch1
         SerReq['switch2']   = Msg.data.devInfo.currentState.switch2

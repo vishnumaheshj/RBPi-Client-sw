@@ -12,7 +12,8 @@ import serverDB
 
 class Mainhandler(tornado.web.RequestHandler):
     def get(self):
-        self.render("index.html", devices=global_devlist)
+        addrList = serverDB.connectionList.values()
+        self.render("index.html", devices=addrList)
 
 class Devhandler(tornado.websocket.WebSocketHandler):
     def open(self):
@@ -20,14 +21,13 @@ class Devhandler(tornado.websocket.WebSocketHandler):
         self.write_message("Server accepted connection\n")
 
     def on_message(self, message):
-        print("Message received %s\n" %message)
         serverMethods.processMsgFromClient(self, message)
 
 
     def on_close(self):
-        for device in global_devlist:
-            if(device.conn == self):
-                global_devlist.remove(device)
+        for connection in serverDB.connectionList.keys():
+            if(connection == self):
+                serverDB.connectionList[connection] = None
                 print("%s closed connection \n" % device.id)
 
 class Userhandler(tornado.web.RequestHandler):
@@ -67,7 +67,7 @@ def main():
     )
     serverDB.initDatabase()
     http_server = tornado.httpserver.HTTPServer(app)
-    http_server.listen(8888)
+    http_server.listen(8808)
     tornado.ioloop.IOLoop.instance().start()
 
 if __name__ == "__main__":
