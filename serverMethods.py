@@ -1,6 +1,7 @@
 import switchboard
 from switchboard import *
 import json
+import serverDB
 
 global_devlist = []
 global_num_devices = 0
@@ -37,11 +38,14 @@ def processMsgFromClient(connection, clientMessage):
         print ("State change Response received")
     elif clientMessage['message_type'] == SB_DEVICE_READY_NTF:
         print ("Hub is up and running")
-        global_num_devices =  1
+        global_num_devices = 1
         if global_num_devices not in [hub.id for hub in global_devlist]:
             device = dotslash_hub(global_num_devices, connection)
             global_devlist.append(device)
         print ("Total Devices %i" % len(global_devlist))
+
+        clientMessage['hubAddr'] = 0x1020304050607080
+        serverDB.addHub(clientMessage)
 
 
 

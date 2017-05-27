@@ -7,6 +7,7 @@ import tornado.ioloop
 import tornado.web
 import serverMethods
 from serverMethods import global_devlist
+import serverDB
 
 
 class Mainhandler(tornado.web.RequestHandler):
@@ -64,6 +65,7 @@ def main():
         template_path = os.path.join(os.path.dirname(__file__), "templates"),
         static_path = os.path.join(os.path.dirname(__file__), "static")
     )
+    serverDB.initDatabase()
     http_server = tornado.httpserver.HTTPServer(app)
     http_server.listen(8888)
     tornado.ioloop.IOLoop.instance().start()

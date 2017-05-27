@@ -90,6 +90,22 @@ class sInfoReq_t(Structure):
 class sInfoRsp_t(Structure):
     _fields_ = [("sbType", switchBoardType_t),
                 ("currentState", hwSwitchBoardState_t)]
+
+# Device join states
+DJ_NEW_DEVICE     = 0x01
+DJ_KNOWN_DEVICE   = 0x02
+
+# Node States
+NS_JUST_JOINED          = 0x1
+NS_EP_ACTIVE            = 0x2
+NS_EP_PARENT_REACHED    = 0x3
+NS_NOT_REACHABLE        = 0x4
+NS_BOARD_READY          = 0x5
+
+# Hub States
+HS_ONLINE     = 0x1
+HS_OFFLINE    = 0x2
+
 class sDevInfo_t(Structure):
     _fields_ = [("joinState", c_ubyte),
                 ("sbType", switchBoardType_t),
