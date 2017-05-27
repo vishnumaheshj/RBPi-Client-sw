@@ -18,7 +18,7 @@ def execute_binary():
     binary = subprocess.Popen("./dataSendRcv.bin", stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     while binary.poll() is None:
         line =  binary.stdout.readline()
-	print("dataSendRcv.bin : %s" %line)
+        print("dataSendRcv.bin : %s" %line)
         if line != '':
             if "Error" in line:
                 print(line)
