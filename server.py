@@ -43,7 +43,7 @@ class Userhandler(tornado.web.RequestHandler):
                     Msg = serverMethods.sentBoardInfoReq(nodeid)
                     device.conn.write_message(Msg)
                 elif (message[:4] == "cmd1"):
-                    Msg = serverMethods.sentStateChangeReq()
+                    Msg = serverMethods.sentStateChangeReq(nodeid)
                     device.conn.write_message(Msg)
                 else:
                     device.conn.write_message(message)

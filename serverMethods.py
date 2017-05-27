@@ -28,8 +28,9 @@ def sentBoardInfoReq(nodeid):
     Msg['flags'] = 0
     return Msg
 
-def sentStateChangeReq():
+def sentStateChangeReq(nodeid):
     Msg = {'message_type': SB_STATE_CHANGE_REQ}
+    Msg['node'] = nodeid
     Msg['sbType'] = SB_TYPE_4X4
     Msg['switch1'] = SW_TURN_ON
     Msg['switch2'] = SW_TURN_OFF

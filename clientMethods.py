@@ -26,6 +26,7 @@ def createMessageForHub(Msg):
         print ("State Change Req")
         HubReq = sbMessage_t()
         HubReq.hdr.type = SB_STATE_CHANGE_REQ
+        HubReq.hdr.nodeid = int(Msg['node'])
         HubReq.data.boardData.sbType.type = SB_TYPE_4X4
         HubReq.data.boardData.switchData.state.switch1 = SW_TURN_ON
         HubReq.data.boardData.switchData.state.switch2 = SW_TURN_OFF
