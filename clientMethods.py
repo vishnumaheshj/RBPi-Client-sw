@@ -56,6 +56,7 @@ def createMessageForServer(Msg):
     elif Msg.hdr.type == SB_STATE_CHANGE_RSP:
         print ("State Change Rsp")
         SerReq = {'message_type': SB_STATE_CHANGE_RSP}
+        SerReq['devIndex'] = Msg.hdr.nodeid
         SerReq['sbType']  = Msg.data.infoRspData.sbType.type
         SerReq['switch1'] = Msg.data.boardData.switchData.state.switch1
         SerReq['switch2'] = Msg.data.boardData.switchData.state.switch2
