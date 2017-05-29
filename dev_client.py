@@ -78,10 +78,11 @@ def dev_connect():
     while 1:
         msg = yield client.read_message()
         print("From dev connect:%s" % msg)
-        Msg = json.loads(msg)
-        Req = clientMethods.createMessageForHub(Msg)
-        clientMethods.writeShm(Req)
-        print("From dev connect: send to hub")
+        if msg:
+            Msg = json.loads(msg)
+            Req = clientMethods.createMessageForHub(Msg)
+            clientMethods.writeShm(Req)
+            print("From dev connect: send to hub")
         continue
     client.close()
 
