@@ -33,10 +33,11 @@ def processMsgFromClient(connection, clientMessage):
     clientMessage = json.loads(clientMessage)
     if clientMessage['message_type'] == SB_BOARD_INFO_RSP:
         print("Board Infp Rsp")
-        print("Message received %s\n" %message)
+        serverDB.updateNode(connection, clientMessage)
+        print("Message received %s\n" %clientMessage)
     elif clientMessage['message_type'] == SB_STATE_CHANGE_RSP:
         print ("State change Response received")
-        print("Message received %s\n" %message)
+        print("Message received %s\n" %clientMessage)
     elif clientMessage['message_type'] == SB_DEVICE_READY_NTF:
         print ("Hub is up and running")
         print("Message received %s\n" %clientMessage)

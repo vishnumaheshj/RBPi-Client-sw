@@ -11,9 +11,8 @@ import serverDB
 
 
 class Mainhandler(tornado.web.RequestHandler):
-    def get(self):
-        addrList = serverDB.connectionList.values()
-        self.render("index.html", devices=addrList)
+    def get(self): 
+        self.render("index.html", devices=serverDB.connectionList.keys())
 
 class Devhandler(tornado.websocket.WebSocketHandler):
     def open(self):
@@ -23,36 +22,38 @@ class Devhandler(tornado.websocket.WebSocketHandler):
     def on_message(self, message):
         serverMethods.processMsgFromClient(self, message)
 
-
     def on_close(self):
-        for connection in serverDB.connectionList.keys():
-            if(connection == self):
-                serverDB.connectionList[connection] = None
-                print("%s closed connection \n" % device.id)
+            if self in serverDB.connectionList.inv:
+                print("\nclosing connection for %d" % serverDB.connectionList.inv[self])
+                del serverDB.connectionList.inv[self]
+                print("closed connection \n")
+                print("connection list")
+                print(serverDB.connectionList)
+            else:
+               print("\nunknown connection closed")
 
 class Userhandler(tornado.web.RequestHandler):
     def post(self):
-        devid = self.get_argument('device', '')
+        hubAddr = self.get_argument('device', '')
         message = self.get_argument('message', '')
         print("Message from user %s" %message)
-        print("Id %s\n" %devid)
+        print("HubAddr %s:\n" %hubAddr)
         found = 0
-        for device in global_devlist:
-            if(device.id == int(devid)):
+        if int(hubAddr) in serverDB.connectionList: 
+                conn = serverDB.connectionList[int(hubAddr)]
                 if (message[:4] == "cmd0"):
                     Msg = serverMethods.sentBoardInfoReq()
-                    device.conn.write_message(Msg)
+                    conn.write_message(Msg)
                 elif (message[:4] == "cmd1"):
                     Msg = serverMethods.sentStateChangeReq()
-                    device.conn.write_message(Msg)
+                    conn.write_message(Msg)
                 else:
-                    device.conn.write_message(message)
+                    conn.write_message(message)
                 found = 1
         if (found == 0):
             self.write("Device not found\n")
         else:
             self.write("Message sent successfully\n")
-
 
 
 def main():

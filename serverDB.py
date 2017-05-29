@@ -1,11 +1,11 @@
 from pymongo import MongoClient
 from datetime import datetime
 from switchboard import *
-import pickle
+from bidict import bidict 
 
 hubCollection = None
 hubStates = None
-connectionList = {}
+connectionList = bidict()
 
 def initDatabase():
     global hubCollection
@@ -16,6 +16,9 @@ def initDatabase():
     hubCollection = db.hubs
     hubStates = db.hubStates
 
+    # REMOVE
+    hubCollection.drop()
+    hubStates.drop()
     # Debug
     print("Database init success")
     print ("hubCollection entries:%d" % hubCollection.count())
@@ -28,8 +31,8 @@ def addHub(connection, clientMessage):
     if clientMessage['message_type'] != SB_DEVICE_READY_NTF:
         return 1
 
-    #connectionList[str(clientMessage['hubAddr'])] = connection
-    connectionList[connection] = clientMessage['hubAddr']
+    #connectionList(connection) = clientMessage['hubAddr']
+    connectionList[clientMessage['hubAddr']] = connection
     
     cursor = hubCollection.find_one({"hubAddr": clientMessage['hubAddr']})
     if cursor is None:
@@ -50,8 +53,9 @@ def addHub(connection, clientMessage):
     for document in cursor:
         print (document)
     print("###############################################################")
-    print("connection lisr")
+    print("connection list")
     print(connectionList)
+    print("###############################################################")
 
 def addHubStates(clientMessage):
     #{"switch6": 4, "joinState": 2, "message_type": 9, "devIndex": 1, "ieeeAddr": 5149013057361641, "switch2": 0, "switch4": 0, "switch7": 4, "epStatus": 5, "sbType": 2, "switch1": 1, "switch3": 1, "switch5": 4, "switch8": 4}
@@ -88,7 +92,7 @@ def addHubStates(clientMessage):
     else:
         print("state present, updating Hub State")
         boardStr = "board"+str(clientMessage['devIndex'])
-        nodeCursor =  hubStates.find_one({boardStr+".devIndex": clientMessage['devIndex']})
+        nodeCursor =  hubStates.find_one({"hubAddr": clientMessage['hubAddr'], boardStr+".devIndex": clientMessage['devIndex']})
         if nodeCursor is None:
             print("New Node Joined");
             hubStates.update_one({"hubAddr", cursor.hubAddr},
@@ -117,9 +121,13 @@ def addHubStates(clientMessage):
 
     document = hubStates.find_one({"hubAddr": clientMessage['hubAddr']})
     if document is not None:
-            print(document)
+        print("document")
+        print(document)
 
 
+def updateNode(connection, clientMessage):
+    print("updating database")
+    pass
 
 
 
