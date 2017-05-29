@@ -75,20 +75,5 @@ def processMsgFromClient(connection, clientMessage):
         clientMessage['hubAddr'] = 0x0102030405060708
         serverDB.addHub(connection, clientMessage)
     elif clientMessage['message_type'] == SB_DEVICE_INFO_NTF:
-		#TBD
-        #print("hub addr:%s" % format(clientMessage['hubAddr'], '#010x'))
-        #serverDB.addHubStates(clientMessage)
-        if clientMessage['sbType'] == SB_TYPE_4X4:
-            id = clientMessage['devIndex']
-            type = clientMessage['sbType']
-            switch1 = clientMessage['switch1']
-            switch2 = clientMessage['switch2']
-            switch3 = clientMessage['switch3']
-            switch4 = clientMessage['switch4']
-            node = switch_node(id, type, switch1, switch2, switch3, switch4)
-            for device in global_devlist:
-                if(device.conn == connection):
-                    device.nodes.append(node)
-            print("Received node info switch 4*4")
-        else:
-            print("Received node info unknown device")
+        print("hub addr:%s" % format(clientMessage['hubAddr'], '#010x'))
+        serverDB.addHubStates(clientMessage, connection)

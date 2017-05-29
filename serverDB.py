@@ -27,6 +27,7 @@ def initDatabase():
 
 def addHub(connection, clientMessage):
     global hubCollection
+    global connectionList
 
     if clientMessage['message_type'] != SB_DEVICE_READY_NTF:
         return 1
@@ -57,22 +58,20 @@ def addHub(connection, clientMessage):
     print(connectionList)
     print("###############################################################")
 
-def addHubStates(clientMessage):
-    #{"switch6": 4, "joinState": 2, "message_type": 9, "devIndex": 1, "ieeeAddr": 5149013057361641, "switch2": 0, "switch4": 0, "switch7": 4, "epStatus": 5, "sbType": 2, "switch1": 1, "switch3": 1, "switch5": 4, "switch8": 4}
+def addHubStates(clientMessage, connection):
     
     global hubStates
-
-    if clientMessage['message_type'] != SB_DEVICE_INFO_NTF:
-        return 1
+    global connectionList
 
     print("Hub Info message")    
-    cursor = hubStates.find_one({"hubAddr": clientMessage['hubAddr']})
+    hubAddr = connectionList.inv[connection]
+    cursor = hubStates.find_one({"hubAddr": hubAddr})
     boardStr = "board"+str(clientMessage['devIndex'])
     if cursor is None:
         print ("cursor none, adding Hub State")
         hubStates.insert_one(
-		{
-            "hubAddr"     : clientMessage['hubAddr'],
+        {
+            "hubAddr"     : hubAddr,
             "totalNodes"  : 1,
             boardStr      : {
                                 "devIndex"     : clientMessage['devIndex'],
@@ -92,9 +91,9 @@ def addHubStates(clientMessage):
     else:
         print("state present, updating Hub State")
         boardStr = "board"+str(clientMessage['devIndex'])
-        nodeCursor =  hubStates.find_one({"hubAddr": clientMessage['hubAddr'], boardStr+".devIndex": clientMessage['devIndex']})
+        nodeCursor =  hubStates.find_one({"hubAddr": hubAddr, boardStr+".devIndex": clientMessage['devIndex']})
         if nodeCursor is None:
-            print("New Node Joined");
+            print("New Node Joined")
             hubStates.update_one({"hubAddr", cursor.hubAddr},
                 {"$set": {
                             "totalNodes" : cursor.totalNodes + 1,
