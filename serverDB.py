@@ -144,11 +144,8 @@ def updateNode(connection, clientMessage):
         nodeCursor.switch7 =  clientMessage['switch7']
         nodeCursor.switch8 =  clientMessage['switch8']
 
-    print("updating database")
-    pass
-
-
-
-
+def findNode(hubAddr, nodeid):
+	boardStr = "board"+str(nodeid)
+	return hubStates.find_one({"hubAddr": hubAddr, boardStr+".devIndex": nodeid})
 
 

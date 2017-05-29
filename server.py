@@ -37,10 +37,13 @@ class Userhandler(tornado.web.RequestHandler):
         found = 0
         if int(hubAddr) in serverDB.connectionList: 
                 conn = serverDB.connectionList[int(hubAddr)]
-#TBD fetch the corresponding node id object from database
-                Msg = serverMethods.sentStateChangeReq(nodeid, node.type, self)
-                conn.write_message(Msg)
-                found = 1
+                node = serverDB.findNode(int(hubAddr), int(nodeid))
+                if node is not None:
+                    Msg = serverMethods.sentStateChangeReq(node.devIndex, node.type, self)
+                    conn.write_message(Msg)
+                    found = 1
+                else:
+                    found = 0
         if (found == 0):
             self.write("Device not found\n")
         else:
