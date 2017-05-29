@@ -8,21 +8,21 @@
 		<h2> Accelerating Present </h2>
 		<h3>Active Devices</h3>
 		<h4>Hub id :
-			{% for device in devices %}
-			<li>{{ str(device) }}</li>
-			{% end %}
+				{% if hubid != 0%}
+			<li>{{ str(hubid) }}</li>
+				{% end %}
 		</h4>
 		<h5> Nodes: </h5>
-			{% for device in devices %}
-				{% for node in device.nodes %}
-				<h5><li>ID : {{ escape(str(node.id)) }} </li>
-					{% if node.type== 0x2%}
-					<form action={{ escape("/user/"+str(device.id)+"/"+str(node.id)) }} method="post" id="user_msg">
+				{% if nodes %}
+				{% for name, details in nodes.items() %}
+				<h5><li>ID : {{ escape(name) }} </li>
+					{% if details['type']== 0x2%}
+					<form action={{ escape("/user/"+str(hubid)+"/"+str(details['devIndex'])) }} method="post" id="user_msg">
 						<li>{{ escape("4 port switch") }}</li>
-						<li> switch 1:{%if node.switch1==0 %}<input type="radio" name="switch1" value="on"> ON<input type="radio" name="switch1" value="off" checked> OFF {%  else %} <input type="radio" name="switch1" value="on" checked> ON<input type="radio" name="switch1" value="off" > OFF{% end %}</li>
-						<li> switch 2:{%if node.switch2==0 %}<input type="radio" name="switch2" value="on"> ON<input type="radio" name="switch2" value="off" checked> OFF {%  else %} <input type="radio" name="switch2" value="on" checked> ON<input type="radio" name="switch2" value="off" > OFF{% end %}</li>
-						<li> switch 3:{%if node.switch3==0 %}<input type="radio" name="switch3" value="on"> ON<input type="radio" name="switch3" value="off" checked> OFF {%  else %} <input type="radio" name="switch3" value="on" checked> ON<input type="radio" name="switch3" value="off" > OFF{% end %}</li>
-						<li> switch 4:{%if node.switch4==0 %}<input type="radio" name="switch4" value="on"> ON<input type="radio" name="switch4" value="off" checked> OFF {%  else %} <input type="radio" name="switch4" value="on" checked> ON<input type="radio" name="switch4" value="off" > OFF{% end %}</li>
+						<li> switch 1:{%if details['switch1']==0 %}<input type="radio" name="switch1" value="on"> ON<input type="radio" name="switch1" value="off" checked> OFF {%  else %} <input type="radio" name="switch1" value="on" checked> ON<input type="radio" name="switch1" value="off" > OFF{% end %}</li>
+						<li> switch 2:{%if details['switch2']==0 %}<input type="radio" name="switch2" value="on"> ON<input type="radio" name="switch2" value="off" checked> OFF {%  else %} <input type="radio" name="switch2" value="on" checked> ON<input type="radio" name="switch2" value="off" > OFF{% end %}</li>
+						<li> switch 3:{%if details['switch3']==0 %}<input type="radio" name="switch3" value="on"> ON<input type="radio" name="switch3" value="off" checked> OFF {%  else %} <input type="radio" name="switch3" value="on" checked> ON<input type="radio" name="switch3" value="off" > OFF{% end %}</li>
+						<li> switch 4:{%if details['switch4']==0 %}<input type="radio" name="switch4" value="on"> ON<input type="radio" name="switch4" value="off" checked> OFF {%  else %} <input type="radio" name="switch4" value="on" checked> ON<input type="radio" name="switch4" value="off" > OFF{% end %}</li>
 						<input type="submit" value="{{_("Post") }}">
 					</form>
 					{% else %}
@@ -31,6 +31,6 @@
 							
 				</h5>
 				{% end %}
-			{% end %}
+				{% end %}
 	</body>
 </html>

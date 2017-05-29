@@ -11,7 +11,18 @@ import serverDB
 
 class Mainhandler(tornado.web.RequestHandler):
     def get(self): 
-        self.render("index.html", devices=serverDB.connectionList.keys())
+        device = 0
+        nodeList = {}
+        devices = serverDB.connectionList.keys()
+#Hardcoding hub as device[0]
+        if devices:
+            device = devices[0]
+        nodeList = serverDB.findHub(device)
+        if nodeList:
+                del nodeList["_id"]
+                del nodeList["hubAddr"]
+                del nodeList["totalNodes"]
+        self.render("index.html", nodes = nodeList, hubid = device)
 
 class Devhandler(tornado.websocket.WebSocketHandler):
     def open(self):

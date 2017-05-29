@@ -148,4 +148,7 @@ def findNode(hubAddr, nodeid):
 	boardStr = "board"+str(nodeid)
 	return hubStates.find_one({"hubAddr": hubAddr, boardStr+".devIndex": nodeid})
 
+def findHub(hubAddr):
+    return hubStates.find_one({"hubAddr": hubAddr})
+
 
