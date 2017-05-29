@@ -125,6 +125,25 @@ def addHubStates(clientMessage, connection):
 
 
 def updateNode(connection, clientMessage):
+    global hubStates
+    global connectionList
+
+    hubAddr = connectionList.inv[connection]
+    boardStr = "board"+str(clientMessage['devIndex'])
+    nodeCursor =  hubStates.find_one({"hubAddr": hubAddr, boardStr+".devIndex": clientMessage['devIndex']})
+
+    if nodeCursor is None:
+        print("The node to be updated is not present")
+    else:
+        nodeCursor.switch1 =  clientMessage['switch1']
+        nodeCursor.switch2 =  clientMessage['switch2']
+        nodeCursor.switch3 =  clientMessage['switch3']
+        nodeCursor.switch4 =  clientMessage['switch4']
+        nodeCursor.switch5 =  clientMessage['switch5']
+        nodeCursor.switch6 =  clientMessage['switch6']
+        nodeCursor.switch7 =  clientMessage['switch7']
+        nodeCursor.switch8 =  clientMessage['switch8']
+
     print("updating database")
     pass
 

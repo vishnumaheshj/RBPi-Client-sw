@@ -50,15 +50,7 @@ def processMsgFromClient(connection, clientMessage):
     clientMessage = json.loads(clientMessage)
     if clientMessage['message_type'] == SB_BOARD_INFO_RSP:
         print ("Info Response received")
-#TBD
-        #serverDB.updateNode(connection, clientMessage)
-        for device in global_devlist:
-            if(device.conn == connection):
-                id = clientMessage['devIndex'] - 1
-                device.nodes[id].switch1 = clientMessage['switch1']
-                device.nodes[id].switch2 = clientMessage['switch2']
-                device.nodes[id].switch3 = clientMessage['switch3']
-                device.nodes[id].switch4 = clientMessage['switch4']
+        serverDB.updateNode(connection, clientMessage)
     elif clientMessage['message_type'] == SB_STATE_CHANGE_RSP:
         print ("State change Response received")
         #Request updated node info as well
