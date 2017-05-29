@@ -8,7 +8,6 @@ import tornado.web
 import serverMethods
 from serverMethods import global_devlist
 
-
 class Mainhandler(tornado.web.RequestHandler):
     def get(self):
         self.render("index.html", devices=global_devlist)
@@ -30,24 +29,16 @@ class Devhandler(tornado.websocket.WebSocketHandler):
                 print("%s closed connection \n" % device.id)
 
 class Userhandler(tornado.web.RequestHandler):
-    def post(self):
-        devid = self.get_argument('device', '')
-        nodeid = self.get_argument('node', '')
-        message = self.get_argument('message', '')
-        print("Message from user %s" %message)
-        print("Id %s\n" %devid)
+    def post(self, devid, nodeid):
+        print("Message from user")
         found = 0
         for device in global_devlist:
             if(device.id == int(devid)):
-                if (message[:4] == "cmd0"):
-                    Msg = serverMethods.sentBoardInfoReq(nodeid)
-                    device.conn.write_message(Msg)
-                elif (message[:4] == "cmd1"):
-                    Msg = serverMethods.sentStateChangeReq(nodeid)
-                    device.conn.write_message(Msg)
-                else:
-                    device.conn.write_message(message)
-                found = 1
+                    for node in device.nodes:
+                            if(node.id == int(nodeid)):
+                                Msg = serverMethods.sentStateChangeReq(nodeid, node.type, self)
+                                device.conn.write_message(Msg)
+                                found =1
         if (found == 0):
             self.write("Device not found\n")
         else:
@@ -58,9 +49,9 @@ class Userhandler(tornado.web.RequestHandler):
 def main():
     app = tornado.web.Application(
         [
-            (r'/', Mainhandler),
-            (r'/dev', Devhandler),
-            (r'/user', Userhandler),
+            (r"/", Mainhandler),
+            (r"/dev", Devhandler),
+            (r"/user/([0-9]+)/([0-9]+)", Userhandler)
         ],
         template_path = os.path.join(os.path.dirname(__file__), "templates"),
         static_path = os.path.join(os.path.dirname(__file__), "static")
