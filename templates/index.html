@@ -9,7 +9,7 @@
 		<h3>Active Devices</h3>
 		<h4>Hub id :
 			{% for device in devices %}
-			<li>{{ escape(str(device.id)) }}</li>
+			<li>{{ str(device) }}</li>
 			{% end %}
 		</h4>
 		<h5> Nodes: </h5>

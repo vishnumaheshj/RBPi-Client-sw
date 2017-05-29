@@ -20,12 +20,12 @@ def execute_binary():
         line =  binary.stdout.readline()
         print("dataSendRcv.bin : %s" %line)
         if line != '':
-            if "Error" in line:
+            if b'Error' in line:
                 print(line)
                 binary_init_status = -1
                 binary.terminate()
                 break
-            if "Done" in line:
+            if b'Done' in line:
                 binary_init_status = 1
 
 def listen_hub():
@@ -72,7 +72,7 @@ def dev_connect():
     global client
     #Connect to server
     #client = yield tornado.websocket.websocket_connect("ws://192.168.0.106:8888/dev")
-    client = yield tornado.websocket.websocket_connect("ws://localhost:8888/dev")
+    client = yield tornado.websocket.websocket_connect("ws://localhost:8808/dev")
     msg = yield client.read_message()
     print("From dev connect:%s" % msg)
     while 1:

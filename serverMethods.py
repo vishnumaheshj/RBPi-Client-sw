@@ -1,6 +1,7 @@
 import switchboard
 from switchboard import *
 import json
+import serverDB
 
 global_devlist = []
 global_num_devices = 0
@@ -19,8 +20,6 @@ class switch_node:
         self.switch2 = b
         self.switch3 = c
         self.switch4 = d
-        
-
 
 def sentBoardInfoReq(nodeid):
     Msg = {'message_type': SB_BOARD_INFO_REQ}
@@ -51,6 +50,8 @@ def processMsgFromClient(connection, clientMessage):
     clientMessage = json.loads(clientMessage)
     if clientMessage['message_type'] == SB_BOARD_INFO_RSP:
         print ("Info Response received")
+#TBD
+        #serverDB.updateNode(connection, clientMessage)
         for device in global_devlist:
             if(device.conn == connection):
                 id = clientMessage['devIndex'] - 1
@@ -65,12 +66,18 @@ def processMsgFromClient(connection, clientMessage):
         connection.write_message(msg)
     elif clientMessage['message_type'] == SB_DEVICE_READY_NTF:
         print ("Hub is up and running")
-        global_num_devices =  1
+        print("Message received %s\n" %clientMessage)
+        global_num_devices = 1
         if global_num_devices not in [hub.id for hub in global_devlist]:
             device = dotslash_hub(global_num_devices, connection)
             global_devlist.append(device)
         print ("Total Devices %i" % len(global_devlist))
+        clientMessage['hubAddr'] = 0x0102030405060708
+        serverDB.addHub(connection, clientMessage)
     elif clientMessage['message_type'] == SB_DEVICE_INFO_NTF:
+		#TBD
+        #print("hub addr:%s" % format(clientMessage['hubAddr'], '#010x'))
+        #serverDB.addHubStates(clientMessage)
         if clientMessage['sbType'] == SB_TYPE_4X4:
             id = clientMessage['devIndex']
             type = clientMessage['sbType']
@@ -85,6 +92,3 @@ def processMsgFromClient(connection, clientMessage):
             print("Received node info switch 4*4")
         else:
             print("Received node info unknown device")
-
-
-
