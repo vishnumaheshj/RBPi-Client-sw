@@ -117,13 +117,13 @@ int read_shm(char *data, int ShmID)
     else if (sMsg->hdr.message_type == SB_DEVICE_INFO_NTF)
     {
 	    printf("r:dev info message.\n");
-        printf("C:::r:sizeof sMsg:%d\n", sizeof(sbMessage_t));
+        printf("C:::r:sizeof sMsg:%lu\n", sizeof(sbMessage_t));
 		
         printf("r: message type:%x\n", sMsg->hdr.message_type);
         printf("r: join state  :%x\n", sMsg->data.devInfo.joinState);
         printf("r: sbType      :%x\n", sMsg->data.devInfo.sbType.type);
         printf("r: dev index   :%x\n", sMsg->data.devInfo.devIndex);
-        printf("r: ieee addr   :%llx\n", sMsg->data.devInfo.ieeeAddr);
+        printf("r: ieee addr   :%lx\n", sMsg->data.devInfo.ieeeAddr);
         printf("r: ep status   :%x\n", sMsg->data.devInfo.epStatus);
         printf("r: switch1     :%x\n", sMsg->data.devInfo.currentState.switch1);
         printf("r: switch2     :%x\n", sMsg->data.devInfo.currentState.switch2);

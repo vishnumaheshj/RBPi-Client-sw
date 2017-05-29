@@ -72,7 +72,7 @@ def dev_connect():
     global client
     #Connect to server
     #client = yield tornado.websocket.websocket_connect("ws://192.168.0.106:8888/dev")
-    client = yield tornado.websocket.websocket_connect("ws://localhost:8808/dev")
+    client = yield tornado.websocket.websocket_connect("ws://localhost:8888/dev")
     msg = yield client.read_message()
     print("From dev connect:%s" % msg)
     while 1:

@@ -59,7 +59,7 @@ def main():
     )
     serverDB.initDatabase()
     http_server = tornado.httpserver.HTTPServer(app)
-    http_server.listen(8808)
+    http_server.listen(8888)
     tornado.ioloop.IOLoop.instance().start()
 
 if __name__ == "__main__":
