@@ -27,15 +27,26 @@ def createMessageForHub(Msg):
         HubReq = sbMessage_t()
         HubReq.hdr.type = SB_STATE_CHANGE_REQ
         HubReq.hdr.nodeid = int(Msg['node'])
-        HubReq.data.boardData.sbType.type = SB_TYPE_4X4
-        HubReq.data.boardData.switchData.state.switch1 = SW_TURN_ON
-        HubReq.data.boardData.switchData.state.switch2 = SW_TURN_OFF
-        HubReq.data.boardData.switchData.state.switch3 = SW_TURN_ON
-        HubReq.data.boardData.switchData.state.switch4 = SW_TURN_OFF
-        HubReq.data.boardData.switchData.state.switch5 = SW_DONT_CARE
-        HubReq.data.boardData.switchData.state.switch6 = SW_DONT_CARE
-        HubReq.data.boardData.switchData.state.switch7 = SW_DONT_CARE
-        HubReq.data.boardData.switchData.state.switch8 = SW_DONT_CARE
+        if (int(Msg['sbType']) == SB_TYPE_4X4):
+            HubReq.data.boardData.sbType.type = SB_TYPE_4X4
+            HubReq.data.boardData.switchData.state.switch1 = int(Msg['switch1'])
+            HubReq.data.boardData.switchData.state.switch2 = int(Msg['switch2'])
+            HubReq.data.boardData.switchData.state.switch3 = int(Msg['switch3'])
+            HubReq.data.boardData.switchData.state.switch4 = int(Msg['switch4'])
+            HubReq.data.boardData.switchData.state.switch5 = SW_DONT_CARE
+            HubReq.data.boardData.switchData.state.switch6 = SW_DONT_CARE
+            HubReq.data.boardData.switchData.state.switch7 = SW_DONT_CARE
+            HubReq.data.boardData.switchData.state.switch8 = SW_DONT_CARE
+        else:
+            HubReq.data.boardData.sbType.type = SB_TYPE_4X4
+            HubReq.data.boardData.switchData.state.switch1 = SW_TURN_ON
+            HubReq.data.boardData.switchData.state.switch2 = SW_TURN_OFF
+            HubReq.data.boardData.switchData.state.switch3 = SW_TURN_ON
+            HubReq.data.boardData.switchData.state.switch4 = SW_TURN_OFF
+            HubReq.data.boardData.switchData.state.switch5 = SW_DONT_CARE
+            HubReq.data.boardData.switchData.state.switch6 = SW_DONT_CARE
+            HubReq.data.boardData.switchData.state.switch7 = SW_DONT_CARE
+            HubReq.data.boardData.switchData.state.switch8 = SW_DONT_CARE
         return HubReq
 
 def createMessageForServer(Msg):
