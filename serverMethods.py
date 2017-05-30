@@ -3,24 +3,6 @@ from switchboard import *
 import json
 import serverDB
 
-global_devlist = []
-global_num_devices = 0
-
-class dotslash_hub:
-    def __init__(self,a,b):
-        self.id = a
-        self.conn = b
-        self.nodes = []
-
-class switch_node:
-    def __init__(self, id, type, a, b, c, d):
-        self.id = id
-        self.type = type
-        self.switch1 = a
-        self.switch2 = b
-        self.switch3 = c
-        self.switch4 = d
-
 def sentBoardInfoReq(nodeid):
     Msg = {'message_type': SB_BOARD_INFO_REQ}
     Msg['node'] = nodeid
@@ -59,11 +41,6 @@ def processMsgFromClient(connection, clientMessage):
     elif clientMessage['message_type'] == SB_DEVICE_READY_NTF:
         print ("Hub is up and running")
         print("Message received %s\n" %clientMessage)
-        global_num_devices = 1
-        if global_num_devices not in [hub.id for hub in global_devlist]:
-            device = dotslash_hub(global_num_devices, connection)
-            global_devlist.append(device)
-        print ("Total Devices %i" % len(global_devlist))
         clientMessage['hubAddr'] = 0x0102030405060708
         serverDB.addHub(connection, clientMessage)
     elif clientMessage['message_type'] == SB_DEVICE_INFO_NTF:

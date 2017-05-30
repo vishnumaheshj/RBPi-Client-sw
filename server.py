@@ -6,7 +6,6 @@ import tornado.websocket
 import tornado.ioloop
 import tornado.web
 import serverMethods
-from serverMethods import global_devlist
 import serverDB
 
 class Mainhandler(tornado.web.RequestHandler):
