@@ -50,7 +50,7 @@ class Userhandler(tornado.web.RequestHandler):
                 conn = serverDB.connectionList[int(hubAddr)]
                 node = serverDB.findNode(int(hubAddr), int(nodeid))
                 if node is not None:
-                    Msg = serverMethods.sentStateChangeReq(node.devIndex, node.type, self)
+                    Msg = serverMethods.sentStateChangeReq(node['devIndex'], node['type'], self)
                     conn.write_message(Msg)
                     found = 1
                 else:

@@ -14,15 +14,15 @@
 		</h4>
 		<h5> Nodes: </h5>
 				{% if nodes %}
-				{% for name, details in nodes.items() %}
+				{% for name in nodes%}
 				<h5><li>ID : {{ escape(name) }} </li>
-					{% if details['type']== 0x2%}
-					<form action={{ escape("/user/"+str(hubid)+"/"+str(details['devIndex'])) }} method="post" id="user_msg">
+					{% if nodes[name]['type']== 0x2%}
+					<form action={{ escape("/user/"+str(hubid)+"/"+str(nodes[name]['devIndex'])) }} method="post" id="user_msg">
 						<li>{{ escape("4 port switch") }}</li>
-						<li> switch 1:{%if details['switch1']==0 %}<input type="radio" name="switch1" value="on"> ON<input type="radio" name="switch1" value="off" checked> OFF {%  else %} <input type="radio" name="switch1" value="on" checked> ON<input type="radio" name="switch1" value="off" > OFF{% end %}</li>
-						<li> switch 2:{%if details['switch2']==0 %}<input type="radio" name="switch2" value="on"> ON<input type="radio" name="switch2" value="off" checked> OFF {%  else %} <input type="radio" name="switch2" value="on" checked> ON<input type="radio" name="switch2" value="off" > OFF{% end %}</li>
-						<li> switch 3:{%if details['switch3']==0 %}<input type="radio" name="switch3" value="on"> ON<input type="radio" name="switch3" value="off" checked> OFF {%  else %} <input type="radio" name="switch3" value="on" checked> ON<input type="radio" name="switch3" value="off" > OFF{% end %}</li>
-						<li> switch 4:{%if details['switch4']==0 %}<input type="radio" name="switch4" value="on"> ON<input type="radio" name="switch4" value="off" checked> OFF {%  else %} <input type="radio" name="switch4" value="on" checked> ON<input type="radio" name="switch4" value="off" > OFF{% end %}</li>
+						<li> switch 1:{%if nodes[name]['switch1']==0 %}<input type="radio" name="switch1" value="on"> ON<input type="radio" name="switch1" value="off" checked> OFF {%  else %} <input type="radio" name="switch1" value="on" checked> ON<input type="radio" name="switch1" value="off" > OFF{% end %}</li>
+						<li> switch 2:{%if nodes[name]['switch2']==0 %}<input type="radio" name="switch2" value="on"> ON<input type="radio" name="switch2" value="off" checked> OFF {%  else %} <input type="radio" name="switch2" value="on" checked> ON<input type="radio" name="switch2" value="off" > OFF{% end %}</li>
+						<li> switch 3:{%if nodes[name]['switch3']==0 %}<input type="radio" name="switch3" value="on"> ON<input type="radio" name="switch3" value="off" checked> OFF {%  else %} <input type="radio" name="switch3" value="on" checked> ON<input type="radio" name="switch3" value="off" > OFF{% end %}</li>
+						<li> switch 4:{%if nodes[name]['switch4']==0 %}<input type="radio" name="switch4" value="on"> ON<input type="radio" name="switch4" value="off" checked> OFF {%  else %} <input type="radio" name="switch4" value="on" checked> ON<input type="radio" name="switch4" value="off" > OFF{% end %}</li>
 						<input type="submit" value="{{_("Post") }}">
 					</form>
 					{% else %}

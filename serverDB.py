@@ -94,9 +94,9 @@ def addHubStates(clientMessage, connection):
         nodeCursor =  hubStates.find_one({"hubAddr": hubAddr, boardStr+".devIndex": clientMessage['devIndex']})
         if nodeCursor is None:
             print("New Node Joined")
-            hubStates.update_one({"hubAddr", cursor.hubAddr},
+            hubStates.update_one({"hubAddr": cursor['hubAddr']},
                 {"$set": {
-                            "totalNodes" : cursor.totalNodes + 1,
+                            "totalNodes" : cursor['totalNodes'] + 1,
                             boardStr     : {
                                             "devIndex"     : clientMessage['devIndex'],
                                             "type"         : clientMessage['sbType'],
@@ -135,18 +135,28 @@ def updateNode(connection, clientMessage):
     if nodeCursor is None:
         print("The node to be updated is not present")
     else:
-        nodeCursor.switch1 =  clientMessage['switch1']
-        nodeCursor.switch2 =  clientMessage['switch2']
-        nodeCursor.switch3 =  clientMessage['switch3']
-        nodeCursor.switch4 =  clientMessage['switch4']
-        nodeCursor.switch5 =  clientMessage['switch5']
-        nodeCursor.switch6 =  clientMessage['switch6']
-        nodeCursor.switch7 =  clientMessage['switch7']
-        nodeCursor.switch8 =  clientMessage['switch8']
+        hubStates.update_one({"hubAddr": nodeCursor['hubAddr']},
+            {"$set": {
+                        boardStr+".lastModified" : datetime.now(),
+                        boardStr+".switch1" : clientMessage['switch1'],
+                        boardStr+".switch2" : clientMessage['switch2'],
+                        boardStr+".switch3" : clientMessage['switch3'],
+                        boardStr+".switch4" : clientMessage['switch4'],
+                        boardStr+".switch5" : clientMessage['switch5'],
+                        boardStr+".switch6" : clientMessage['switch6'],
+                        boardStr+".switch7" : clientMessage['switch7'],
+                        boardStr+".switch8" : clientMessage['switch8'],
+                    }
+            })
 
 def findNode(hubAddr, nodeid):
-	boardStr = "board"+str(nodeid)
-	return hubStates.find_one({"hubAddr": hubAddr, boardStr+".devIndex": nodeid})
+    boardStr = "board"+str(nodeid)
+    row = hubStates.find_one({"hubAddr": hubAddr, boardStr+".devIndex": nodeid})
+    if row is not None:
+            node = row[boardStr]
+            return node
+    else:
+            return None
 
 def findHub(hubAddr):
     return hubStates.find_one({"hubAddr": hubAddr})
