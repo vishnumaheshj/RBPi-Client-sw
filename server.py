@@ -15,7 +15,7 @@ class Mainhandler(tornado.web.RequestHandler):
         devices = serverDB.connectionList.keys()
 #Hardcoding hub as device[0]
         if devices:
-            device = devices[0]
+            device = list(devices)[0]
         nodeList = serverDB.findHub(device)
         if nodeList:
                 del nodeList["_id"]
