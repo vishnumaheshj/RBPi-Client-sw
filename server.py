@@ -57,7 +57,8 @@ class Userhandler(tornado.web.RequestHandler):
         if (found == 0):
             self.write("Device not found\n")
         else:
-            self.write("Message sent successfully\n")
+            #self.write("Message sent successfully\n")
+            self.redirect(self.get_argument("next"))
 
 
 def main():
