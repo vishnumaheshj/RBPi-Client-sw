@@ -162,3 +162,16 @@ def findHub(hubAddr):
     return hubStates.find_one({"hubAddr": hubAddr})
 
 
+def makeHubOffline(hubAddr):
+        hubCollection.update_one({"hubAddr": hubAddr},
+            {"$set": {
+                "active"       : HS_OFFLINE,
+                "offlineSince" : datetime.now(),
+			         }
+			})
+        
+        document = hubCollection.find_one({"hubAddr": hubAddr})
+        if document is not None:
+            print("document")
+            print(document)
+            print("'''''''''''''''")

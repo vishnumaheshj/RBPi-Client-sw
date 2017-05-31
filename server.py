@@ -8,7 +8,13 @@ import tornado.web
 import serverMethods
 import serverDB
 
-class Mainhandler(tornado.web.RequestHandler):
+class BaseHandler(tornado.web.RequestHandler):
+    def get_current_user(self):
+	    return self.get_secure_cookie("username")
+
+
+class Mainhandler(BaseHandler):
+    @tornado.web.authenticated
     def get(self): 
         device = 0
         nodeList = {}
@@ -34,6 +40,7 @@ class Devhandler(tornado.websocket.WebSocketHandler):
     def on_close(self):
             if self in serverDB.connectionList.inv:
                 print("\nclosing connection for %d" % serverDB.connectionList.inv[self])
+                makeHubOffline(serverDB.connectionList.inv[self])
                 del serverDB.connectionList.inv[self]
                 print("closed connection \n")
                 print("connection list")
@@ -41,7 +48,8 @@ class Devhandler(tornado.websocket.WebSocketHandler):
             else:
                print("\nunknown connection closed")
 
-class Userhandler(tornado.web.RequestHandler):
+class Userhandler(BaseHandler):
+    @tornado.web.authenticated
     def post(self, hubAddr, nodeid):
         print("Message from user")
         found = 0
@@ -59,16 +67,34 @@ class Userhandler(tornado.web.RequestHandler):
         else:
             self.write("Message sent successfully\n")
 
+class LoginHandler(BaseHandler):
+    def get(self):
+	    self.render("login.html")
+	
+    def post(self):
+        self.set_secure_cookie("username", self.get_argument("username"))
+        self.redirect("/")
+
+
+class LogoutHandler(BaseHandler):
+    def get(self):
+        self.clear_cookie("username")
+        self.redirect("/")
+
 
 def main():
     app = tornado.web.Application(
         [
             (r"/", Mainhandler),
             (r"/dev", Devhandler),
-            (r"/user/([0-9]+)/([0-9]+)", Userhandler)
+            (r"/user/([0-9]+)/([0-9]+)", Userhandler),
+			(r"/login", LoginHandler),
+			(r"/logout", LogoutHandler),
         ],
         template_path = os.path.join(os.path.dirname(__file__), "templates"),
-        static_path = os.path.join(os.path.dirname(__file__), "static")
+        static_path = os.path.join(os.path.dirname(__file__), "static"),
+		cookie_secret = "98RaTgemQjS/zVMMFr8oZ35z9S1UsEaGgl/E3cpxm/E=",
+		login_url = "/login"
     )
     serverDB.initDatabase()
     http_server = tornado.httpserver.HTTPServer(app)
