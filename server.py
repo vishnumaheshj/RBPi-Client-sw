@@ -21,7 +21,7 @@ class Mainhandler(BaseHandler):
         devices = serverDB.connectionList.keys()
 #Hardcoding hub as device[0]
         if devices:
-            device = devices[0]
+            device = list(devices)[0]
         nodeList = serverDB.findHub(device)
         if nodeList:
                 del nodeList["_id"]
@@ -65,7 +65,8 @@ class Userhandler(BaseHandler):
         if (found == 0):
             self.write("Device not found\n")
         else:
-            self.write("Message sent successfully\n")
+            #self.write("Message sent successfully\n")
+            self.redirect(self.get_argument("next"))
 
 class LoginHandler(BaseHandler):
     def get(self):

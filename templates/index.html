@@ -25,6 +25,7 @@
 						<li> switch 3:{%if nodes[name]['switch3']==0 %}<input type="radio" name="switch3" value="on"> ON<input type="radio" name="switch3" value="off" checked> OFF {%  else %} <input type="radio" name="switch3" value="on" checked> ON<input type="radio" name="switch3" value="off" > OFF{% end %}</li>
 						<li> switch 4:{%if nodes[name]['switch4']==0 %}<input type="radio" name="switch4" value="on"> ON<input type="radio" name="switch4" value="off" checked> OFF {%  else %} <input type="radio" name="switch4" value="on" checked> ON<input type="radio" name="switch4" value="off" > OFF{% end %}</li>
 						<input type="submit" value="{{_("Post") }}">
+						<input type="hidden" name="next" value="{{ request.path }}">
 					</form>
 					{% else %}
 						<li>{{ escape("Unknown type") }}</li>

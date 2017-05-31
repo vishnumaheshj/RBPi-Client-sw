@@ -35,8 +35,6 @@ def processMsgFromClient(connection, clientMessage):
         serverDB.updateNode(connection, clientMessage)
     elif clientMessage['message_type'] == SB_STATE_CHANGE_RSP:
         print ("State change Response received")
-        #Request updated node info as well
-        msg = sentBoardInfoReq(clientMessage['devIndex'])
         connection.write_message(msg)
     elif clientMessage['message_type'] == SB_DEVICE_READY_NTF:
         print ("Hub is up and running")
