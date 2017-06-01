@@ -6,7 +6,12 @@
 	<body>
 		<h1> DOTSLASH INC </h1>
 		<h2> Accelerating Present </h2>
-		<h2> Hai.. {{ handler.current_user }} </h2>
+        <p> Hai {{ handler.current_user }},
+        <form action="/logout" method="post" id="logout">
+            {% module xsrf_form_html() %}
+            <input type="hidden" name="username" value={{ handler.current_user }}>
+            <input type="submit" value="Logout">
+        </form></p>
 		<h3>Active Devices</h3>
 		<h4>Hub id :
 				{% if hubid != 0%}
@@ -24,8 +29,9 @@
 						<li> switch 2:{%if nodes[name]['switch2']==0 %}<input type="radio" name="switch2" value="on"> ON<input type="radio" name="switch2" value="off" checked> OFF {%  else %} <input type="radio" name="switch2" value="on" checked> ON<input type="radio" name="switch2" value="off" > OFF{% end %}</li>
 						<li> switch 3:{%if nodes[name]['switch3']==0 %}<input type="radio" name="switch3" value="on"> ON<input type="radio" name="switch3" value="off" checked> OFF {%  else %} <input type="radio" name="switch3" value="on" checked> ON<input type="radio" name="switch3" value="off" > OFF{% end %}</li>
 						<li> switch 4:{%if nodes[name]['switch4']==0 %}<input type="radio" name="switch4" value="on"> ON<input type="radio" name="switch4" value="off" checked> OFF {%  else %} <input type="radio" name="switch4" value="on" checked> ON<input type="radio" name="switch4" value="off" > OFF{% end %}</li>
-						<input type="submit" value="{{_("Post") }}">
 						<input type="hidden" name="next" value="{{ request.path }}">
+						{% module xsrf_form_html() %}
+						<input type="submit" value="{{_("Post") }}">
 					</form>
 					{% else %}
 						<li>{{ escape("Unknown type") }}</li>

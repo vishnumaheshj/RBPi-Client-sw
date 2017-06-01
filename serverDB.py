@@ -1,28 +1,34 @@
 from pymongo import MongoClient
 from datetime import datetime
 from switchboard import *
-from bidict import bidict 
+from bidict import bidict
+import security
 
 hubCollection = None
 hubStates = None
+hubUsers = None
 connectionList = bidict()
 
 def initDatabase():
     global hubCollection
     global hubStates
+    global hubUsers
 
     client = MongoClient()
     db = client.dotslash
     hubCollection = db.hubs
     hubStates = db.hubStates
+    hubUsers = db.hubUsers
 
     # REMOVE
     hubCollection.drop()
     hubStates.drop()
+    hubUsers.drop()
     # Debug
     print("Database init success")
     print ("hubCollection entries:%d" % hubCollection.count())
     print ("hubStates entries:%d" % hubStates.count())
+    print ("hubUsers entries:%d" % hubUsers.count())
 
 
 def addHub(connection, clientMessage):
@@ -167,11 +173,85 @@ def makeHubOffline(hubAddr):
             {"$set": {
                 "active"       : HS_OFFLINE,
                 "offlineSince" : datetime.now(),
-			         }
-			})
-        
+                    }
+            })
+
         document = hubCollection.find_one({"hubAddr": hubAddr})
         if document is not None:
             print("document")
             print(document)
             print("'''''''''''''''")
+
+def addUser(username, password):
+    cursor = hubUsers.find_one({"username": username})
+    if cursor is None:
+        print("New user..")
+        phash = security.hashInterface.hash(password)
+        hubUsers.insert_one(
+            {
+                "username": username,
+                "passwordhash" : phash,
+            }
+        )
+        status = None
+    else:
+        print("Already registered user!")
+        status = "Already registered user!"
+
+    userDB = hubUsers.find_one({})
+    if userDB is not None:
+        print("user database")
+        print(userDB)
+
+    return status
+
+
+def loginUser(username, password):
+    cursor = hubUsers.find_one({"username": username})
+    if cursor is not None:
+        print("checking hash")
+        hashStatus = security.hashInterface.verify(password, cursor['passwordhash'])
+        if hashStatus is True:
+            print("user loged in: %s" % username)
+            hubUsers.update_one({"username": username},
+                                         {"$set": {
+                                             "loggedin": 1,
+                                             "lastlogin": datetime.now()
+                                         }
+                                         })
+            status = None
+        else:
+            status = "login attempt failed, username/password didn't match"
+            print("login attempt failed: password is incorrect")
+    else:
+        status = "login attempt failed, username/password didn't match"
+        print("login attempt failed: No such user")
+
+    userDB = hubUsers.find_one({})
+    if userDB is not None:
+        print("user database")
+        print(userDB)
+
+    return status
+
+
+def logoutUser(username):
+    cursor = hubUsers.find_one({"username": username})
+    if cursor is not None:
+        hubUsers.update_one({"username": username},
+                             {"$set": {
+                                        "loggedin"  : 0,
+                                      }
+                             })
+        status = None
+        print("user %s logged out" % username)
+    else:
+        print("unknown user!")
+        status = "unknown user!"
+
+    userDB = hubUsers.find_one({})
+    if userDB is not None:
+        print("user database")
+        print(userDB)
+
+    return status

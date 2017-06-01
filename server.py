@@ -10,7 +10,7 @@ import serverDB
 
 class BaseHandler(tornado.web.RequestHandler):
     def get_current_user(self):
-	    return self.get_secure_cookie("username")
+        return self.get_secure_cookie("username")
 
 
 class Mainhandler(BaseHandler):
@@ -40,7 +40,7 @@ class Devhandler(tornado.websocket.WebSocketHandler):
     def on_close(self):
             if self in serverDB.connectionList.inv:
                 print("\nclosing connection for %d" % serverDB.connectionList.inv[self])
-                makeHubOffline(serverDB.connectionList.inv[self])
+                serverDB.makeHubOffline(serverDB.connectionList.inv[self])
                 del serverDB.connectionList.inv[self]
                 print("closed connection \n")
                 print("connection list")
@@ -70,18 +70,45 @@ class Userhandler(BaseHandler):
 
 class LoginHandler(BaseHandler):
     def get(self):
-	    self.render("login.html")
-	
+        self.render("login.html")
+
     def post(self):
-        self.set_secure_cookie("username", self.get_argument("username"))
-        self.redirect("/")
+        username = tornado.escape.xhtml_escape(self.get_argument("username"))
+        password = tornado.escape.xhtml_escape(self.get_argument("password"))
+        print("username:%s" % username)
+        print("password %s" % password)
+
+        error = serverDB.loginUser(username, password)
+        if not error:
+            self.set_secure_cookie("username", username)
+            self.redirect(self.get_argument("next", "/"))
+        else:
+            self.render("login.html", errorString = error)
 
 
 class LogoutHandler(BaseHandler):
-    def get(self):
+    def post(self):
+        username = tornado.escape.xhtml_escape(self.get_argument("username"))
+
+        serverDB.logoutUser(username)
         self.clear_cookie("username")
         self.redirect("/")
 
+class SignupHandler(BaseHandler):
+    def get(self):
+        self.render("login.html", logintype="signup")
+
+    def post(self):
+        username = tornado.escape.xhtml_escape(self.get_argument("username"))
+        password = tornado.escape.xhtml_escape(self.get_argument("password"))
+        print("username:%s" % username)
+        print("password %s" % password)
+
+        error = serverDB.addUser(username, password)
+        if not error:
+            self.redirect("/login")
+        else:
+            self.render("login.html", logintype = "signup", errorString = error)
 
 def main():
     app = tornado.web.Application(
@@ -89,13 +116,16 @@ def main():
             (r"/", Mainhandler),
             (r"/dev", Devhandler),
             (r"/user/([0-9]+)/([0-9]+)", Userhandler),
-			(r"/login", LoginHandler),
-			(r"/logout", LogoutHandler),
+            (r"/login", LoginHandler),
+            (r"/logout", LogoutHandler),
+            (r"/signup", SignupHandler),
         ],
         template_path = os.path.join(os.path.dirname(__file__), "templates"),
         static_path = os.path.join(os.path.dirname(__file__), "static"),
-		cookie_secret = "98RaTgemQjS/zVMMFr8oZ35z9S1UsEaGgl/E3cpxm/E=",
-		login_url = "/login"
+        cookie_secret = "98RaTgemQjS/zVMMFr8oZ35z9S1UsEaGgl/E3cpxm/E=",
+        login_url = "/login",
+        xsrf_cookies = "True",
+        degug = "True",
     )
     serverDB.initDatabase()
     http_server = tornado.httpserver.HTTPServer(app)
