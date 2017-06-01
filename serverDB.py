@@ -221,10 +221,10 @@ def loginUser(username, password):
                                          })
             status = None
         else:
-            status = "login attempt failed, username/password didn't match"
+            status = "Username/Password mismatch"
             print("login attempt failed: password is incorrect")
     else:
-        status = "login attempt failed, username/password didn't match"
+        status = "Username/Password mismatch"
         print("login attempt failed: No such user")
 
     userDB = hubUsers.find_one({})
