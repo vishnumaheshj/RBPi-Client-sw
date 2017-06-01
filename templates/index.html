@@ -6,18 +6,14 @@
 	<body>
 		<h1> DOTSLASH INC </h1>
 		<h2> Accelerating Present </h2>
-        <p> Hai {{ handler.current_user }},
+        <p> {{ handler.current_user }}'s dashboard,
         <form action="/logout" method="post" id="logout">
             {% module xsrf_form_html() %}
             <input type="hidden" name="username" value={{ handler.current_user }}>
             <input type="submit" value="Logout">
         </form></p>
-		<h3>Active Devices</h3>
-		<h4>Hub id :
-				{% if hubid != 0%}
-			<li>{{ str(hubid) }}</li>
-				{% end %}
-		</h4>
+				{% if hubid != 0 %}
+			<li><h4> Hub is active</h4><li>
 		<h5> Nodes: </h5>
 				{% if nodes %}
 				{% for name, values in nodes.items()%}
@@ -41,6 +37,10 @@
 				</h5>
                 {% end %}
 				{% end %}
+				{% end %}
+
+				{% else %} 
+			<li><h4> Hub is offline</h4><li>
 				{% end %}
 	</body>
 </html>
