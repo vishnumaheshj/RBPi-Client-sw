@@ -1,35 +1,41 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
     <head>
-        {% if 'logintype' in globals() and logintype == "signup" %}
-            <title>Create your account</title>
-        {% else %}
-	        <title>Sign In</title>
-        {% end %}
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+            <title>Dotslash INC</title>
+		<link rel="stylesheet" href="{{ static_url("dist/css/bootstrap.min.css") }}" type="text/css">
+		<link rel="stylesheet" href="{{ static_url("login.css") }}" type="text/css">
+
 	</head>
 	<body>
+	<div class="container">
     {% if 'logintype' in globals() and logintype == "signup" %}
+		<form action="/signup" method="POST" class="form-signin">
         {% if 'errorString' in globals() %}
-            <p>{{ errorString }}</p>
+			<div class="alert alert-danger">{{ errorString }}</div>
         {% end %}
-        <p><a href="/login"> Have an account? Sign In </a></p>
-		<form action="/signup" method="POST">
+        <a href="/login"><h5 class="form-signin-heading"> Have an account? Sign In </h5></a>
             {% module xsrf_form_html() %}
-		 	<p>Username: <input type="text" name="username" /></p>
-            <p> Hub ID : <input type="text" name="hubid" /></p>
-            <p>Password: <input type="password" name="password" /></p></p>
-			<p><input type="submit" value="Sign Up" /></p>
+			<h4 class="form-signin-heading">Sign Up</h4>
+		 	<input type="text" name="username" id="inputUsername" class="form-control" placeholder="Username" required autofocus/>
+		 	<input type="text" name="hubid" id="inputHubid" class="form-control" placeholder="Hub ID Number" required autofocus/>
+            <input type="password" name="password" id="inputPassword" class="form-control" placeholder="Password" required/>
+			<button class="btn btn-lg btn-primary btn-block" type="submit">Sign Up</button>
 		</form>
     {% else %}
+		<form action="/login" method="POST" class="form-signin">
         {% if 'errorString' in globals() %}
-            <p>{{ errorString }}</p>
+			<div class="alert alert-danger">{{ errorString }}</div>
         {% end %}
-        <p><a href="/signup"> No Account? Create one </a></p>
-		<form action="/login" method="POST">
+        <a href="/signup"><h5 class="form-signin-heading"> No Account? Create one </h5></a>
             {% module xsrf_form_html() %}
-		 	<p>Username: <input type="text" name="username" /></p>
-            <p>Password: <input type="password" name="password" /></p></p>
-			<p><input type="submit" value="Log In" /></p>
+			<h4 class="form-signin-heading">Log In</h4>
+		 	<input type="text" name="username" id="inputEmail" class="form-control" placeholder="Username" required autofocus/>
+            <input type="password" name="password" id="inputPassword" class="form-control" placeholder="Password" required/>
+			<button class="btn btn-lg btn-primary btn-block" type="submit">Log In</button>
 		</form>
     {% end %}
+	</div>
 	</body>
 </html>
