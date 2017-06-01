@@ -39,7 +39,6 @@ def processMsgFromClient(connection, clientMessage):
     elif clientMessage['message_type'] == SB_DEVICE_READY_NTF:
         print ("Hub is up and running")
         print("Message received %s\n" %clientMessage)
-        clientMessage['hubAddr'] = 0x0102030405060708
         serverDB.addHub(connection, clientMessage)
     elif clientMessage['message_type'] == SB_DEVICE_INFO_NTF:
         print("hub addr:%s" % format(clientMessage['hubAddr'], '#010x'))

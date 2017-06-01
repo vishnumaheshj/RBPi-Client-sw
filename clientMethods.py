@@ -81,6 +81,7 @@ def createMessageForServer(Msg):
     elif Msg.hdr.type == SB_DEVICE_READY_NTF:
         print("Device Up notification")
         SerReq = {'message_type': SB_DEVICE_READY_NTF}
+        SerReq['hubAddr'] = 0x0102030405060708
         return SerReq
     elif Msg.hdr.type == SB_DEVICE_INFO_NTF:
         print("Device Info notification")
