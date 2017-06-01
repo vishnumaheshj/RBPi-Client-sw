@@ -16,17 +16,11 @@ class BaseHandler(tornado.web.RequestHandler):
 class Mainhandler(BaseHandler):
     @tornado.web.authenticated
     def get(self): 
-        device = 0
+        device = serverDB.findUserHub(self.current_user)
+        print("Device of user %s:%d" %(self.current_user, device))
         nodeList = {}
-        devices = serverDB.connectionList.keys()
-#Hardcoding hub as device[0]
-        if devices:
-            device = list(devices)[0]
-        nodeList = serverDB.findHub(device)
-        if nodeList:
-                del nodeList["_id"]
-                del nodeList["hubAddr"]
-                del nodeList["totalNodes"]
+        if device:
+            nodeList = serverDB.findHub(device)
         self.render("index.html", nodes = nodeList, hubid = device)
 
 class Devhandler(tornado.websocket.WebSocketHandler):
@@ -101,12 +95,18 @@ class SignupHandler(BaseHandler):
     def post(self):
         username = tornado.escape.xhtml_escape(self.get_argument("username"))
         password = tornado.escape.xhtml_escape(self.get_argument("password"))
+        hubid = int(tornado.escape.xhtml_escape(self.get_argument("hubid")))
         print("username:%s" % username)
         print("password %s" % password)
+        print("HudId %d" % hubid)
 
         error = serverDB.addUser(username, password)
         if not error:
-            self.redirect("/login")
+            error = serverDB.registerHub(username, hubid)
+            if not error:
+                self.redirect("/login")
+            else:
+                self.render("login.html", logintype = "signup", errorString = error)
         else:
             self.render("login.html", logintype = "signup", errorString = error)
 

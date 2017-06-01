@@ -255,3 +255,40 @@ def logoutUser(username):
         print(userDB)
 
     return status
+
+def registerHub(username, hubId):
+    cursor = hubUsers.find_one({"username": username})
+    if cursor is not None:
+        hubCursor = hubCollection.find_one({"hubAddr": hubId})
+        if hubCursor is not None:
+            hubCollection.update_one({"hubAddr": hubId},
+                                     {"$set":   {
+                                                    "user": username,
+                                                }
+                                     })
+            status = None
+        else:
+            print("User Added.Hub hasn't joined")
+            status = "User Added.Hub hasn't joined"
+    else:
+        print("Signup failed.Hub not registered")
+        status = "Signup failed.Hub not registered"
+
+    hubsDB = hubCollection.find_one({})
+    if hubsDB is not None:
+        print("hub database")
+        print(hubsDB)
+
+    return status
+
+def findUserHub(username):
+    cursor = hubUsers.find_one({"username": username})
+    if cursor is not None:
+        hubCursor = hubCollection.find_one({"user": username})
+        if hubCursor is not None:                               # Assuming a single document for now.
+            print("Found hub of user %s" %username)
+            return hubCursor["hubAddr"]
+        else:
+            return 0
+    else:
+        return 0
