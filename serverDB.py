@@ -50,12 +50,25 @@ def addHub(connection, clientMessage):
                 "joinTime"     : datetime.now(),
                 "active"       : HS_ONLINE,
                 "offlineSince" : 0,
+                "user"         : None,
             }
         )
-        print ("Hub Added")
+        print ("Hub Activated.User not registered yet")
 
     else:
-        print ("Known hub")
+        hubCursor = hubCollection.find_one({"hubAddr": clientMessage['hubAddr'], "$or": [{"active": HS_ONLINE}, {"active": HS_OFFLINE}]})
+        if hubCursor is None:
+            print("Hub is already registered by user.Activating...") 
+            hubCollection.update_one({"hubAddr": clientMessage['hubAddr']},
+                                     {"$set":   {
+                                                   "joinTime"     : datetime.now(),
+                                                   "active"       : HS_ONLINE,
+                                                   "offlineSince" : 0,
+                                                }
+                                     })
+        else:
+            print("Hub is already active")
+    
     cursor = hubCollection.find({"hubAddr": clientMessage['hubAddr']})
     for document in cursor:
         print (document)
@@ -269,7 +282,17 @@ def registerHub(username, hubId):
             status = None
         else:
             print("User Added.Hub hasn't joined")
-            status = "User Added.Hub hasn't joined"
+            hubCollection.insert_one(
+                {
+                "hubAddr"      : hubId,
+                "joinTime"     : None,
+                "active"       : None,
+                "offlineSince" : None,
+                "user"         : username,
+                }
+            )
+ 
+            status = None;
     else:
         print("Signup failed.Hub not registered")
         status = "Signup failed.Hub not registered"
@@ -286,7 +309,6 @@ def findUserHub(username):
     if cursor is not None:
         hubCursor = hubCollection.find_one({"user": username})
         if hubCursor is not None:                               # Assuming a single document for now.
-            print("Found hub of user %s" %username)
             return hubCursor["hubAddr"]
         else:
             return 0
