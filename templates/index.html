@@ -1,132 +1,144 @@
 <!DOCTYPE html>
 <html lang ="en">
-	<head>
-     <meta charset="utf-8">
-     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-     <meta name="viewport" content="width=device-width, initial-scale=1">
-	 <title> DOTSLASH DASHBOARD</title>
-	<script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
-	<script src="{{ static_url("dist/js/bootstrap-toggle.min.js") }}"></script>
-	<link href="{{ static_url("dist/css/bootstrap.min.css") }}" rel="stylesheet">
-	<link href="{{ static_url("dist/css/bootstrap-toggle.min.css") }}" rel="stylesheet">
-	 <link rel="stylesheet" href="{{ static_url("dashboard.css") }}" type="text/css">
-	</head>
-	<body>
-    <nav class="navbar navbar-inverse navbar-fixed-top">
-      <div class="container-fluid">
-        <div class="navbar-header">
-          <a class="navbar-brand" href="#">Dotslash</a>
+ <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title> DOTSLASH DASHBOARD</title>
+  <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <script src="{{ static_url("dist/js/bootstrap-toggle.min.js") }}"></script>
+  <link href="{{ static_url("dist/css/bootstrap.min.css") }}" rel="stylesheet">
+  <link href="{{ static_url("dist/css/bootstrap-toggle.min.css") }}" rel="stylesheet">
+  <link rel="stylesheet" href="{{ static_url("dashboard.css") }}" type="text/css">
+ </head>
+ <body>
+  <nav class="navbar navbar-inverse navbar-fixed-top">
+   <div class="container-fluid">
+    <div class="navbar-header">
+     <a class="navbar-brand" href="#">Dotslash</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+     <ul class="nav navbar-nav navbar-right">
+      <li><a href="#">Settings</a></li>
+      <li>
+       <form action="/logout" method="post" id="logout" class="navbar-form navbar-right">
+        {% module xsrf_form_html() %}
+        <div class="form-group">
+         <input type="hidden" name="username" value={{ handler.current_user }}>
+         <button class="btn btn-sm btn-primary btn-block" type="submit">Logout</button>
         </div>
-        <div id="navbar" class="navbar-collapse collapse">
-          <ul class="nav navbar-nav navbar-right">
-            <li><a href="#">Settings</a></li>
-        	<li><form action="/logout" method="post" id="logout" class="navbar-form navbar-right">
-            {% module xsrf_form_html() %}
-            <input type="hidden" name="username" value={{ handler.current_user }}>
-			<div class="form-group">
-			<button class="btn btn-sm btn-primary btn-block" type="submit">Logout</button>
-			</div>
-        	</form></li>
-          </ul>
-        </div>
+       </form>
+      </li>
+     </ul>
+    </div>
+   </div>
+  </nav>
+  <div class="container-fluid">
+   <div class="row">
+    <div class="col-sm-3 col-md-2 sidebar">
+     <ul class="nav nav-sidebar">
+      <li class="active"><a href="#">Overview <span class="sr-only">(current)</span></a></li>
+      <li><a href="#">Reports</a></li>
+      <li><a href="#">Analytics</a></li>
+     </ul>
+    </div>
+    <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+     <h1 class="page-header">{{ handler.current_user.title() }}'s dashboard</h1>
+     {% if hubid != 0 %}
+     <div class="row placeholders">
+      <div class="col-xs-6 col-sm-3 placeholder">
+       <h3><span class="label label-success">Hub is active</span></h3>
       </div>
-    </nav>
-    <div class="container-fluid">
-      <div class="row">
-        <div class="col-sm-3 col-md-2 sidebar">
-          <ul class="nav nav-sidebar">
-            <li class="active"><a href="#">Overview <span class="sr-only">(current)</span></a></li>
-            <li><a href="#">Reports</a></li>
-            <li><a href="#">Analytics</a></li>
-          </ul>
-        </div>
-        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-          <h1 class="page-header">{{ handler.current_user.title() }}'s dashboard</h1>
-				{% if hubid != 0 %}
-          <div class="row placeholders">
-            <div class="col-xs-6 col-sm-3 placeholder">
-			<h3><span class="label label-success">Hub is active</span></h3>
-            </div>
-            <div class="col-xs-6 col-sm-3 placeholder" style="margin-top: 20px">
-			<button class="btn btn-sm btn-primary" onClick="window.location.reload()"><span class="glyphicon glyphicon-refresh"></span> Refresh</button>
-            </div>
-          </div>
-				{% if nodes %}
-				{% for name, values in nodes.items()%}
-                {% if type(values) is dict %}
-          <h4><span class="label label-default">{{ escape(name.title()) }}</span></h4>
-					{% if nodes[name]['type']== 0x2%}
-					<form action={{ escape("/user/"+str(hubid)+"/"+str(nodes[name]['devIndex'])) }} method="post" id="user_msg">
-          <div class="table-responsive">
-            <table class="table table-hover">
-			<tr>
-						<td> <span class="label label-info">Switch 1</span></td>
-						<td>
-						{%if nodes[name]['switch1']==0 %}
-						 <input type="checkbox" name="switch1" data-toggle="toggle" >
-						{%  else %}
-						 <input type="checkbox" name="switch1" data-toggle="toggle" checked>
-						{% end %}
-						</td>
-			</tr>
-			<tr>
-						<td><span class="label label-info">Switch 2</span></td>
-						<td>
-						{%if nodes[name]['switch2']==0 %}
-						 <input type="checkbox" name="switch2" data-toggle="toggle" >
-						{%  else %}
-						 <input type="checkbox" name="switch2" data-toggle="toggle" checked>
-						 {% end %}
-						 </td>
-			</tr>
-			<tr>
-						<td><span class="label label-info">Switch 3</span></td>
-						<td>
-						{%if nodes[name]['switch3']==0 %}
-						 <input type="checkbox" name="switch3" data-toggle="toggle" >
-						{%  else %}
-						 <input type="checkbox" name="switch3" data-toggle="toggle" checked>
-						 {% end %}
-						 </td>
-			</tr>
-			<tr>
-						<td><span class="label label-info">Switch 4</span></td>
-						<td>
-						{%if nodes[name]['switch4']==0 %}
-						 <input type="checkbox" name="switch4" data-toggle="toggle" >
-						{%  else %}
-						 <input type="checkbox" name="switch4" data-toggle="toggle" checked>
-						 {% end %}
-						 </td>
-			</tr>
-			<tr>
-			<td>			<input type="hidden" name="next" value="{{ request.path }}">
-						{% module xsrf_form_html() %}
-					<button class="btn btn-sm btn-primary " type="submit">Update</button>
-			</td><td></td>
-			</tr>
-					</form>
-					{% else %}
-						<li>{{ escape("Unknown type") }}</li>
-					{% end %}
-							
-				</h5>
-                {% end %}
-				{% end %}
-				{% end %}
-
-				{% else %} 
-          <div class="row placeholders">
-            <div class="col-xs-6 col-sm-3 placeholder">
-			<h3><span class="label label-danger">Hub is offline</span></h4>
-            </div>
-            <div class="col-xs-6 col-sm-3 placeholder" style="margin-top: 20px">
-			<button class="btn btn-sm btn-primary" onClick="window.location.reload()"><span class="glyphicon glyphicon-refresh"></span> Refresh</button>
-            </div>
-          </div>
-				{% end %}
-	  </div>
-	 </div>
-	</div>
-	</body>
+      <div class="col-xs-6 col-sm-3 placeholder" style="margin-top: 20px">
+       <button class="btn btn-sm btn-primary" onClick="window.location.reload()"><span class="glyphicon glyphicon-refresh"></span> Refresh</button>
+      </div>
+     </div>
+     {% if nodes %}
+     {% for name, values in nodes.items()%}
+     {% if type(values) is dict %}
+     <h4><span class="label label-default">{{ escape(name.title()) }}</span></h4>
+     {% if nodes[name]['type']== 0x2%}
+     <form action={{ escape("/user/"+str(hubid)+"/"+str(nodes[name]['devIndex'])) }} method="post" id="user_msg">
+      <div class="table-responsive">
+       <table class="table table-hover">
+        <tr>
+         <td>
+          <span class="label label-info">Switch 1</span>
+         </td>
+         <td>
+          {%if nodes[name]['switch1']==0 %}
+          <input type="checkbox" name="switch1" data-toggle="toggle" >
+          {%  else %}
+          <input type="checkbox" name="switch1" data-toggle="toggle" checked>
+          {% end %}
+         </td>
+        </tr>
+        <tr>
+         <td>
+          <span class="label label-info">Switch 2</span>
+         </td>
+         <td>
+          {%if nodes[name]['switch2']==0 %}
+          <input type="checkbox" name="switch2" data-toggle="toggle" >
+          {%  else %}
+          <input type="checkbox" name="switch2" data-toggle="toggle" checked>
+          {% end %}
+         </td>
+        </tr>
+        <tr>
+         <td>
+          <span class="label label-info">Switch 3</span>
+         </td>
+         <td>
+          {%if nodes[name]['switch3']==0 %}
+          <input type="checkbox" name="switch3" data-toggle="toggle" >
+          {% else %}
+          <input type="checkbox" name="switch3" data-toggle="toggle" checked>
+          {% end %}
+         </td>
+        </tr>
+        <tr>
+         <td>
+          <span class="label label-info">Switch 4</span>
+         </td>
+         <td>
+          {%if nodes[name]['switch4']==0 %}
+          <input type="checkbox" name="switch4" data-toggle="toggle" >
+          {%  else %}
+          <input type="checkbox" name="switch4" data-toggle="toggle" checked>
+          {% end %}
+         </td>
+        </tr>
+        <tr>
+         <td>
+          <input type="hidden" name="next" value="{{ request.path }}">
+          {% module xsrf_form_html() %}
+          <button class="btn btn-sm btn-primary " type="submit">Update</button>
+         </td>
+         <td>
+         </td>
+        </tr>
+       </table>
+      </div>
+     </form>
+     {% else %}
+     <li>{{ escape("Unknown type") }}</li>
+     {% end %}
+     {% end %}
+     {% end %}
+     {% end %}
+     {% else %} 
+     <div class="row placeholders">
+      <div class="col-xs-6 col-sm-3 placeholder">
+       <h3><span class="label label-danger">Hub is offline</span></h3>
+      </div>
+      <div class="col-xs-6 col-sm-3 placeholder" style="margin-top: 20px">
+       <button class="btn btn-sm btn-primary" onClick="window.location.reload()"><span class="glyphicon glyphicon-refresh"></span> Refresh</button>
+      </div>
+     </div>
+     {% end %}
+    </div>
+   </div>
+  </div>
+ </body>
 </html>
