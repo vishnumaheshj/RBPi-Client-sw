@@ -1,17 +1,34 @@
 <!DOCTYPE html>
-<html>
+<html lang ="en">
 	<head>
-		<title> DOTSLASH </title>
+     <meta charset="utf-8">
+     <meta http-equiv="X-UA-Compatible" content="IE=edge">
+     <meta name="viewport" content="width=device-width, initial-scale=1">
+	 <title> DOTSLASH DASHBOARD</title>
+	 <link rel="stylesheet" href="{{ static_url("dist/css/bootstrap.min.css") }}" type="text/css">
+	 <link rel="stylesheet" href="{{ static_url("dashboard.css") }}" type="text/css">
 	</head>
 	<body>
-		<h1> DOTSLASH INC </h1>
-		<h2> Accelerating Present </h2>
-        <p> {{ handler.current_user }}'s dashboard,
-        <form action="/logout" method="post" id="logout">
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="#">Dotslash</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav navbar-right">
+            <li><a href="#">Settings</a></li>
+        	<li><form action="/logout" method="post" id="logout" class="navbar-form navbar-right">
             {% module xsrf_form_html() %}
             <input type="hidden" name="username" value={{ handler.current_user }}>
-            <input type="submit" value="Logout">
-        </form></p>
+			<div class="form-group">
+			<button class="btn btn-sm btn-primary btn-block" type="submit">Logout</button>
+			</div>
+        	</form></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+        <p> {{ handler.current_user }}'s dashboard,</p>
 				{% if hubid != 0 %}
 			<li><h4> Hub is active</h4><li>
 		<h5> Nodes: </h5>
