@@ -51,7 +51,7 @@
 				{% if nodes %}
 				{% for name, values in nodes.items()%}
                 {% if type(values) is dict %}
-          <h4 class="sub-header"><span class="label label-primary">{{ escape(name.title()) }}</span></h4>
+          <h4 class="sub-header"><span class="label label-default">{{ escape(name.title()) }}</span></h4>
 					{% if nodes[name]['type']== 0x2%}
 					<form action={{ escape("/user/"+str(hubid)+"/"+str(nodes[name]['devIndex'])) }} method="post" id="user_msg">
 						<li> <span class="label label-info">Switch 1</span>{%if nodes[name]['switch1']==0 %}<input type="radio" name="switch1" value="on"> ON<input type="radio" name="switch1" value="off" checked> OFF {%  else %} <input type="radio" name="switch1" value="on" checked> ON<input type="radio" name="switch1" value="off" > OFF{% end %}</li>
@@ -60,7 +60,7 @@
 						<li><span class="label label-info">Switch 4</span>{%if nodes[name]['switch4']==0 %}<input type="radio" name="switch4" value="on"> ON<input type="radio" name="switch4" value="off" checked> OFF {%  else %} <input type="radio" name="switch4" value="on" checked> ON<input type="radio" name="switch4" value="off" > OFF{% end %}</li>
 						<input type="hidden" name="next" value="{{ request.path }}">
 						{% module xsrf_form_html() %}
-						<input type="submit" value="{{_("Post") }}">
+					<button class="btn btn-sm btn-primary " type="submit">Update</button>
 					</form>
 					{% else %}
 						<li>{{ escape("Unknown type") }}</li>
