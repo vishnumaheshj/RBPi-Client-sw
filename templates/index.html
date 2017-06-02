@@ -5,7 +5,10 @@
      <meta http-equiv="X-UA-Compatible" content="IE=edge">
      <meta name="viewport" content="width=device-width, initial-scale=1">
 	 <title> DOTSLASH DASHBOARD</title>
-	 <link rel="stylesheet" href="{{ static_url("dist/css/bootstrap.min.css") }}" type="text/css">
+	<script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+	<script src="{{ static_url("dist/js/bootstrap-toggle.min.js") }}"></script>
+	<link href="{{ static_url("dist/css/bootstrap.min.css") }}" rel="stylesheet">
+	<link href="{{ static_url("dist/css/bootstrap-toggle.min.css") }}" rel="stylesheet">
 	 <link rel="stylesheet" href="{{ static_url("dashboard.css") }}" type="text/css">
 	</head>
 	<body>
@@ -51,16 +54,57 @@
 				{% if nodes %}
 				{% for name, values in nodes.items()%}
                 {% if type(values) is dict %}
-          <h4 class="sub-header"><span class="label label-default">{{ escape(name.title()) }}</span></h4>
+          <h4><span class="label label-default">{{ escape(name.title()) }}</span></h4>
 					{% if nodes[name]['type']== 0x2%}
 					<form action={{ escape("/user/"+str(hubid)+"/"+str(nodes[name]['devIndex'])) }} method="post" id="user_msg">
-						<li> <span class="label label-info">Switch 1</span>{%if nodes[name]['switch1']==0 %}<input type="radio" name="switch1" value="on"> ON<input type="radio" name="switch1" value="off" checked> OFF {%  else %} <input type="radio" name="switch1" value="on" checked> ON<input type="radio" name="switch1" value="off" > OFF{% end %}</li>
-						<li><span class="label label-info">Switch 2</span>{%if nodes[name]['switch2']==0 %}<input type="radio" name="switch2" value="on"> ON<input type="radio" name="switch2" value="off" checked> OFF {%  else %} <input type="radio" name="switch2" value="on" checked> ON<input type="radio" name="switch2" value="off" > OFF{% end %}</li>
-						<li><span class="label label-info">Switch 3</span>{%if nodes[name]['switch3']==0 %}<input type="radio" name="switch3" value="on"> ON<input type="radio" name="switch3" value="off" checked> OFF {%  else %} <input type="radio" name="switch3" value="on" checked> ON<input type="radio" name="switch3" value="off" > OFF{% end %}</li>
-						<li><span class="label label-info">Switch 4</span>{%if nodes[name]['switch4']==0 %}<input type="radio" name="switch4" value="on"> ON<input type="radio" name="switch4" value="off" checked> OFF {%  else %} <input type="radio" name="switch4" value="on" checked> ON<input type="radio" name="switch4" value="off" > OFF{% end %}</li>
-						<input type="hidden" name="next" value="{{ request.path }}">
+          <div class="table-responsive">
+            <table class="table table-hover">
+			<tr>
+						<td> <span class="label label-info">Switch 1</span></td>
+						<td>
+						{%if nodes[name]['switch1']==0 %}
+						 <input type="checkbox" name="switch1" data-toggle="toggle" >
+						{%  else %}
+						 <input type="checkbox" name="switch1" data-toggle="toggle" checked>
+						{% end %}
+						</td>
+			</tr>
+			<tr>
+						<td><span class="label label-info">Switch 2</span></td>
+						<td>
+						{%if nodes[name]['switch2']==0 %}
+						 <input type="checkbox" name="switch2" data-toggle="toggle" >
+						{%  else %}
+						 <input type="checkbox" name="switch2" data-toggle="toggle" checked>
+						 {% end %}
+						 </td>
+			</tr>
+			<tr>
+						<td><span class="label label-info">Switch 3</span></td>
+						<td>
+						{%if nodes[name]['switch3']==0 %}
+						 <input type="checkbox" name="switch3" data-toggle="toggle" >
+						{%  else %}
+						 <input type="checkbox" name="switch3" data-toggle="toggle" checked>
+						 {% end %}
+						 </td>
+			</tr>
+			<tr>
+						<td><span class="label label-info">Switch 4</span></td>
+						<td>
+						{%if nodes[name]['switch4']==0 %}
+						 <input type="checkbox" name="switch4" data-toggle="toggle" >
+						{%  else %}
+						 <input type="checkbox" name="switch4" data-toggle="toggle" checked>
+						 {% end %}
+						 </td>
+			</tr>
+			<tr>
+			<td>			<input type="hidden" name="next" value="{{ request.path }}">
 						{% module xsrf_form_html() %}
 					<button class="btn btn-sm btn-primary " type="submit">Update</button>
+			</td><td></td>
+			</tr>
 					</form>
 					{% else %}
 						<li>{{ escape("Unknown type") }}</li>
