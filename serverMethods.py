@@ -13,10 +13,10 @@ def sentStateChangeReq(nodeid, sbtype, self):
     Msg = {'message_type': SB_STATE_CHANGE_REQ}
     Msg['node'] = nodeid
     if(sbtype == SB_TYPE_4X4):
-        switch1 = self.get_argument('switch1')
-        switch2 = self.get_argument('switch2')
-        switch3 = self.get_argument('switch3')
-        switch4 = self.get_argument('switch4')
+        switch1 = self.get_argument('switch1', default=None)
+        switch2 = self.get_argument('switch2', default=None)
+        switch3 = self.get_argument('switch3', default=None)
+        switch4 = self.get_argument('switch4', default=None)
         Msg['sbType'] = SB_TYPE_4X4
         Msg['switch1'] = SW_TURN_ON if (switch1 == 'on') else SW_TURN_OFF
         Msg['switch2'] = SW_TURN_ON if (switch2 == 'on') else SW_TURN_OFF
