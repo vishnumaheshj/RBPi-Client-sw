@@ -5,8 +5,6 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title> DOTSLASH DASHBOARD</title>
-  <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
-  <script src="{{ static_url("dist/js/bootstrap-toggle.min.js") }}"></script>
   <link href="{{ static_url("dist/css/bootstrap.min.css") }}" rel="stylesheet">
   <link href="{{ static_url("dist/css/bootstrap-toggle.min.css") }}" rel="stylesheet">
   <link rel="stylesheet" href="{{ static_url("dashboard.css") }}" type="text/css">
@@ -15,6 +13,11 @@
   <nav class="navbar navbar-inverse navbar-fixed-top">
    <div class="container-fluid">
     <div class="navbar-header">
+     <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>                        
+     </button>
      <a class="navbar-brand" href="#">Dotslash</a>
     </div>
     <div id="navbar" class="navbar-collapse collapse">
@@ -140,5 +143,8 @@
     </div>
    </div>
   </div>
+  <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <script src="{{ static_url("dist/js/bootstrap-toggle.min.js") }}"></script>
+  <script src="{{ static_url("dist/js/bootstrap.min.js") }}"></script>
  </body>
 </html>
