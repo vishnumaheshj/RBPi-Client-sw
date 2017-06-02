@@ -28,9 +28,26 @@
         </div>
       </div>
     </nav>
-        <p> {{ handler.current_user }}'s dashboard,</p>
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-sm-3 col-md-2 sidebar">
+          <ul class="nav nav-sidebar">
+            <li class="active"><a href="#">Overview <span class="sr-only">(current)</span></a></li>
+            <li><a href="#">Reports</a></li>
+            <li><a href="#">Analytics</a></li>
+          </ul>
+        </div>
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+          <h1 class="page-header">{{ handler.current_user }}'s dashboard</h1>
 				{% if hubid != 0 %}
-			<li><h4> Hub is active</h4><li>
+          <div class="row placeholders">
+            <div class="col-xs-6 col-sm-3 placeholder">
+			<h3><span class="label label-success">Hub is active</span></h3>
+            </div>
+            <div class="col-xs-6 col-sm-3 placeholder" style="margin-top: 20px">
+			<button class="btn btn-sm btn-primary"><span class="glyphicon glyphicon-refresh"></span> Refresh</button>
+            </div>
+          </div>
 		<h5> Nodes: </h5>
 				{% if nodes %}
 				{% for name, values in nodes.items()%}
@@ -57,7 +74,17 @@
 				{% end %}
 
 				{% else %} 
-			<li><h4> Hub is offline</h4><li>
+          <div class="row placeholders">
+            <div class="col-xs-6 col-sm-3 placeholder">
+			<h3><span class="label label-danger">Hub is offline</span></h4>
+            </div>
+            <div class="col-xs-6 col-sm-3 placeholder" style="margin-top: 20px">
+			<button class="btn btn-sm btn-primary"><span class="glyphicon glyphicon-refresh"></span> Refresh</button>
+            </div>
+          </div>
 				{% end %}
+	  </div>
+	 </div>
+	</div>
 	</body>
 </html>
