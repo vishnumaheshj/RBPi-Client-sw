@@ -60,7 +60,13 @@ class Userhandler(BaseHandler):
             self.write("Device not found\n")
         else:
             #self.write("Message sent successfully\n")
-            self.redirect(self.get_argument("next"))
+            #self.redirect(self.get_argument("next"))
+            device = serverDB.findUserHub(self.current_user)
+            print("device of user %s:%d" % (self.current_user, device))
+            nodeList = {}
+            if device:
+                nodeList = serverDB.findHub(device)
+            self.render("index.html", nodes=nodeList, hubid=device)
 
 class LoginHandler(BaseHandler):
     def get(self):

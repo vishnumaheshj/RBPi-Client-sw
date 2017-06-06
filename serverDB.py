@@ -21,9 +21,9 @@ def initDatabase():
     hubUsers = db.hubUsers
 
     # REMOVE
-    hubCollection.drop()
-    hubStates.drop()
-    hubUsers.drop()
+#    hubCollection.drop()
+#    hubStates.drop()
+#    hubUsers.drop()
     # Debug
     print("Database init success")
     print ("hubCollection entries:%d" % hubCollection.count())
