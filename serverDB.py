@@ -336,7 +336,7 @@ def findUserHub(username):
 
 def checkHubActive(hubAddr):
     cursor = hubCollection.find_one({"hubAddr": hubAddr})
-    if cursor is not None:
+    if "active" is in cursor:
             if (cursor["active"] == HS_ONLINE):
                     return True
             else:
