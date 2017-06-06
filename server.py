@@ -21,7 +21,10 @@ class Mainhandler(BaseHandler):
         nodeList = {}
         if device:
             nodeList = serverDB.findHub(device)
+        if serverDB.checkHubActive(device) is False:
+            device = 0
         self.render("index.html", nodes = nodeList, hubid = device)
+
 
 class Devhandler(tornado.websocket.WebSocketHandler):
     def open(self):
