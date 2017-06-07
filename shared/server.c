@@ -164,7 +164,7 @@ int write_shm(char *data, int MsgQID)
         printf("w:unknown message\n");
     }
 
-    memset(&buf.msg, 0, 256);
+    memset(&buf.msg, 0, dataSize);
     memcpy(&buf.msg, data, dataSize);
     if (msgsnd(MsgQID, &buf, dataSize, 0) == -1) {
         perror("msgsnd");
