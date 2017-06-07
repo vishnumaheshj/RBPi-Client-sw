@@ -21,11 +21,12 @@
 #include  <sys/msg.h>
 #include  <unistd.h>
 #include  <string.h>
+#include  <stdint.h>
 #include "switchboard.h"
 
 struct msgq_buf {
     long mtype;
-    char mtext[256];
+	sbMessage_t msg;
 };
 
 
@@ -91,7 +92,7 @@ int read_shm(char *data, int MsgQID)
         return -1;
     }
 
-    sMsg = (sbMessage_t *)buf.mtext;
+    sMsg = (sbMessage_t *)&buf.msg;
 
 
     if (sMsg->hdr.message_type == SB_BOARD_INFO_RSP)
@@ -131,7 +132,7 @@ int read_shm(char *data, int MsgQID)
         printf("r:unknown message\n");
     }
 
-    memcpy(data, buf.mtext, dataSize);
+    memcpy(data, &buf.msg, dataSize);
     return dataSize;
 }
 
@@ -163,8 +164,8 @@ int write_shm(char *data, int MsgQID)
         printf("w:unknown message\n");
     }
 
-    memset(buf.mtext, 0, 256);
-    memcpy(buf.mtext, data, dataSize);
+    memset(&buf.msg, 0, 256);
+    memcpy(&buf.msg, data, dataSize);
     if (msgsnd(MsgQID, &buf, dataSize, 0) == -1) {
         perror("msgsnd");
         return -1;
