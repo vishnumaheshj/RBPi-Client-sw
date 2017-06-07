@@ -106,12 +106,12 @@ typedef struct
 
 typedef struct
 {
-	uint8 joinState;
-	switchBoardType_t sbType;
-	uint8 devIndex;
-	unsigned long int ieeeAddr;
-	uint8 epStatus;
+	uint64_t ieeeAddr;
 	hwSwitchBoardState_t currentState;
+	switchBoardType_t sbType;
+	uint8 joinState;
+	uint8 devIndex;
+	uint8 epStatus;
 } sDevInfo_t;
 
 typedef struct
