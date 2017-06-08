@@ -61,7 +61,7 @@
      {% if type(values) is dict %}
      <h4><span class="label label-default">{{ escape(name.title()) }}</span></h4>
      {% if nodes[name]['type']== 0x2%}
-	 {{ devIndex = str(nodes[name]['devIndex']) }}
+	 {% set devIndex = str(nodes[name]['devIndex']) %}
      <form action={{ escape("/user/"+str(hubid)+"/"+devIndex) }} method="post" id={{ escape("user_msg"+devIndex) }}  autocomplete="off">
       <div class="table-responsive">
        <table class="table table-hover">
@@ -71,9 +71,9 @@
          </td>
          <td>
           {%if nodes[name]['switch1']==0 %}
-          <input type="checkbox" name="switch1" data-toggle="toggle" >
+          <input type="checkbox" name="switch1" id="switch1" data-toggle="toggle" >
           {%  else %}
-          <input type="checkbox" name="switch1" data-toggle="toggle" checked>
+          <input type="checkbox" name="switch1" id="switch1" data-toggle="toggle" checked>
           {% end %}
          </td>
         </tr>
@@ -83,9 +83,9 @@
          </td>
          <td>
           {%if nodes[name]['switch2']==0 %}
-          <input type="checkbox" name="switch2" data-toggle="toggle" >
+          <input type="checkbox" name="switch2" id="switch2" data-toggle="toggle" >
           {%  else %}
-          <input type="checkbox" name="switch2" data-toggle="toggle" checked>
+          <input type="checkbox" name="switch2" id="switch2" data-toggle="toggle" checked>
           {% end %}
          </td>
         </tr>
@@ -95,9 +95,9 @@
          </td>
          <td>
           {%if nodes[name]['switch3']==0 %}
-          <input type="checkbox" name="switch3" data-toggle="toggle" >
+          <input type="checkbox" name="switch3" id="switch3" data-toggle="toggle" >
           {% else %}
-          <input type="checkbox" name="switch3" data-toggle="toggle" checked>
+          <input type="checkbox" name="switch3" id="switch3" data-toggle="toggle" checked>
           {% end %}
          </td>
         </tr>
@@ -107,9 +107,9 @@
          </td>
          <td>
           {%if nodes[name]['switch4']==0 %}
-          <input type="checkbox" name="switch4" data-toggle="toggle" >
+          <input type="checkbox" name="switch4" id="switch4" data-toggle="toggle" >
           {%  else %}
-          <input type="checkbox" name="switch4" data-toggle="toggle" checked>
+          <input type="checkbox" name="switch4" id="switch4" data-toggle="toggle" checked>
           {% end %}
          </td>
         </tr>
