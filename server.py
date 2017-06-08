@@ -7,6 +7,10 @@ import tornado.ioloop
 import tornado.web
 import serverMethods
 import serverDB
+from bson import json_util
+from tornado import gen
+import json
+
 
 class BaseHandler(tornado.web.RequestHandler):
     def get_current_user(self):
@@ -21,6 +25,8 @@ class Mainhandler(BaseHandler):
         nodeList = {}
         if device:
             nodeList = serverDB.findHub(device)
+        else:
+            print(serverDB.hubCollection.find_one({}))
         self.render("index.html", nodes = nodeList, hubid = device)
 
 class Devhandler(tornado.websocket.WebSocketHandler):
@@ -42,16 +48,45 @@ class Devhandler(tornado.websocket.WebSocketHandler):
             else:
                print("\nunknown connection closed")
 
+class SocketHandler(tornado.websocket.WebSocketHandler):
+    def open(self):
+        print("!!!!!!! New socket connection !!!!!!!!!!!!!!\n")
+
+    def on_message(self, message):
+        print("message from browser:%s" %message)
+        self.write_message("Hai browser!!\n")
+
+    def on_close(self):
+               print("socket connection closed")
+
+
 class Userhandler(BaseHandler):
     @tornado.web.authenticated
+    @gen.coroutine
     def post(self, hubAddr, nodeid):
-        print("Message from user")
+        print("Message from user %s, hubAddr:%s nodeid:%s" %(self.current_user, hubAddr, nodeid))
         found = 0
+
+        # ADD CHECK FOR HUB IN USER DATABASE.
+        #device = serverDB.findUserHub(self.current_user)
+        #print("device of user %s:%d" % (self.current_user, device))
+        #if device:
+        #    nodeList = serverDB.findHub(device)
+
         if int(hubAddr) in serverDB.connectionList: 
                 conn = serverDB.connectionList[int(hubAddr)]
-                node = serverDB.findNode(int(hubAddr), int(nodeid))
-                if node is not None:
+                nodeList = serverDB.findHub(int(hubAddr))
+                boardStr = "board" + nodeid
+
+                if boardStr in nodeList:
+                    node = nodeList[boardStr]
                     Msg = serverMethods.sentStateChangeReq(node['devIndex'], node['type'], self)
+                    #  serverMethods.activeNum = serverMethods.activeNum + 1    # Later
+                    serverMethods.activeList[serverMethods.activeNum] = 0
+                    
+                    print("sent state change")
+                    Msg.update({'mid': serverMethods.activeNum})
+                    print(Msg)
                     conn.write_message(Msg)
                     found = 1
                 else:
@@ -59,14 +94,17 @@ class Userhandler(BaseHandler):
         if (found == 0):
             self.write("Device not found\n")
         else:
-            #self.write("Message sent successfully\n")
-            #self.redirect(self.get_argument("next"))
-            device = serverDB.findUserHub(self.current_user)
-            print("device of user %s:%d" % (self.current_user, device))
-            nodeList = {}
-            if device:
-                nodeList = serverDB.findHub(device)
-            self.render("index.html", nodes=nodeList, hubid=device)
+            # Async Wait for info response.
+            # Fetch and send result.
+            i = 0
+            while(i < 4 and serverMethods.activeList[serverMethods.activeNum] == 0):
+                yield gen.sleep(1)
+                i = 1 + 1
+            print("i:%d,active list" % i)
+            print(serverMethods.activeList)
+            
+            nodeList = serverDB.findHub(int(hubAddr))
+            self.write(json.dumps(nodeList, default=json_util.default))
 
 class LoginHandler(BaseHandler):
     def get(self):
@@ -121,6 +159,7 @@ def main():
         [
             (r"/", Mainhandler),
             (r"/dev", Devhandler),
+			(r"/socket", SocketHandler),
             (r"/user/([0-9]+)/([0-9]+)", Userhandler),
             (r"/login", LoginHandler),
             (r"/logout", LogoutHandler),

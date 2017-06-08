@@ -61,7 +61,8 @@
      {% if type(values) is dict %}
      <h4><span class="label label-default">{{ escape(name.title()) }}</span></h4>
      {% if nodes[name]['type']== 0x2%}
-     <form action={{ escape("/user/"+str(hubid)+"/"+str(nodes[name]['devIndex'])) }} method="post" id="user_msg" autocomplete="off">
+	 {{ devIndex = str(nodes[name]['devIndex']) }}
+     <form action={{ escape("/user/"+str(hubid)+"/"+devIndex) }} method="post" id={{ escape("user_msg"+devIndex) }}  autocomplete="off">
       <div class="table-responsive">
        <table class="table table-hover">
         <tr>

@@ -3,6 +3,9 @@ from switchboard import *
 import json
 import serverDB
 
+activeList =  {}
+activeNum = 1
+
 def sentBoardInfoReq(nodeid):
     Msg = {'message_type': SB_BOARD_INFO_REQ}
     Msg['node'] = nodeid
@@ -28,11 +31,23 @@ def sentStateChangeReq(nodeid, sbtype, self):
         Msg['switch8'] = SW_DONT_CARE
     return Msg
 
+def informWebClient(message):
+    mid = message['mid']
+    if mid in activeList:
+        activeList[mid] = 1
+    else:
+        print("NO ACTIVE REQUEST FOUND FOR RESPONSE")
+    print("ActiveList")
+    print(activeList)
+    
+
 def processMsgFromClient(connection, clientMessage):
     clientMessage = json.loads(clientMessage)
     if clientMessage['message_type'] == SB_BOARD_INFO_RSP:
         print ("Info Response received")
         serverDB.updateNode(connection, clientMessage)
+        clientMessage.update({'mid': 1})
+        informWebClient(clientMessage)
     elif clientMessage['message_type'] == SB_STATE_CHANGE_RSP:
         print ("State change Response received")
         connection.write_message(msg)
