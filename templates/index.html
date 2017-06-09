@@ -116,11 +116,14 @@
          <td>
           <input type="hidden" name="next" value="{{ request.path }}">
           {% module xsrf_form_html() %}
-          <button class="btn btn-sm btn-primary " type="submit">Update</button>
+          <button class="btn btn-sm btn-primary " onclick="loadSpiral()" type="submit">Update</button>
          </td>
          <td>
          </td>
         </tr>
+        <div id="modal">
+		 <img id="loader" src="{{ static_url("images/loading.gif") }}"/>
+	   </div>
        </table>
       </div>
      </form>
@@ -146,5 +149,6 @@
   <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
   <script src="{{ static_url("dist/js/bootstrap-toggle.min.js") }}"></script>
   <script src="{{ static_url("dist/js/bootstrap.min.js") }}"></script>
+  <script src="{{ static_url("site.js") }}"></script>
  </body>
 </html>
