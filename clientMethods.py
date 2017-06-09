@@ -55,6 +55,7 @@ def createMessageForServer(Msg):
         print("Info Rsp")
         SerReq = {'message_type': SB_BOARD_INFO_RSP}
         SerReq['devIndex'] = Msg.hdr.nodeid
+        SerReq['mid'] = Msg.hdr.mid
         SerReq['sbType']  = Msg.data.infoRspData.sbType.type
         SerReq['switch1'] = Msg.data.infoRspData.currentState.switch1
         SerReq['switch2'] = Msg.data.infoRspData.currentState.switch2

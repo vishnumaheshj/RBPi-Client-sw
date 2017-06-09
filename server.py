@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+from __future__ import division
 import os.path
 import tornado.httpserver
 import tornado.websocket
@@ -72,7 +73,7 @@ class Userhandler(BaseHandler):
                 if boardStr in nodeList:
                     node = nodeList[boardStr]
                     Msg = serverMethods.sentStateChangeReq(node['devIndex'], node['type'], self)
-                    #  serverMethods.activeNum = serverMethods.activeNum + 1    # Later
+                    serverMethods.activeNum = serverMethods.activeNum + 1
                     serverMethods.activeList[serverMethods.activeNum] = 0
                     
                     print("sent state change")
@@ -88,11 +89,13 @@ class Userhandler(BaseHandler):
             # Async Wait for info response.
             # Fetch and send result.
             i = 0
-            while(i < 4 and serverMethods.activeList[serverMethods.activeNum] == 0):
-                yield gen.sleep(1)
-                i = 1 + 1
-            print("i:%d,active list" % i)
+            while(i < 20 and serverMethods.activeList[serverMethods.activeNum] == 0):
+                yield gen.sleep(0.2)
+                i = i + 1
+            print("yield sleep sec(s),active list is")
             print(serverMethods.activeList)
+            print(i/5)
+            del serverMethods.activeList[serverMethods.activeNum]
             
             nodeList = serverDB.findHub(int(hubAddr))
             self.write(json.dumps(nodeList, default=json_util.default))
