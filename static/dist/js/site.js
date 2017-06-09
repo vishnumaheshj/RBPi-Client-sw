@@ -42,6 +42,8 @@ function processAndToggle(data) {
 $("[id^=user_msg]").submit(function(e) {
 
     e.preventDefault(); // avoid to execute the actual submit of the form.
+    $("[id^=board]").prop('disabled', true);
+    document.getElementById('modal').style.display = 'block';
 
     $.ajax({
            type: $(this).attr('method'),
@@ -49,7 +51,10 @@ $("[id^=user_msg]").submit(function(e) {
            data: $(this).serialize(), // serializes the form's elements.
            success: function(data)
            {
+                $("[id^=board]").prop('disabled', false);
 				processAndToggle(data);
+                document.getElementById('modal').style.display = 'none';
+
            }
          });
 });
