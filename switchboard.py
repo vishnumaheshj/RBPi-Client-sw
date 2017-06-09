@@ -97,12 +97,12 @@ HS_ONLINE     = 0x1
 HS_OFFLINE    = 0x2
 
 class sDevInfo_t(Structure):
-    _fields_ = [("joinState", c_ubyte),
+    _fields_ = [("ieeeAddr", c_ulonglong),
+                ("currentState", hwSwitchBoardState_t),
                 ("sbType", switchBoardType_t),
+				("joinState", c_ubyte),
                 ("devIndex", c_ubyte),
-                ("ieeeAddr", c_ulonglong),
-                ("epStatus", c_ubyte),
-                ("currentState", hwSwitchBoardState_t)]
+                ("epStatus", c_ubyte)]
 
 class sbMessageData_t(Union):
     _fields_ = [("boardData", sBoard_t),

@@ -48,9 +48,6 @@ def listen_hub():
 
 @gen.coroutine
 def dev_connect():
-    thread = Thread(target = listen_hub)
-    thread.daemon = True
-    thread.start()
 
     #Execute dataSendRcv binary on separate thread
     thread = Thread(target = execute_binary)
@@ -66,9 +63,11 @@ def dev_connect():
     else:
         print("ZNP init success, connecting to server")
 
+    thread = Thread(target = listen_hub)
+    thread.daemon = True
+    thread.start()
     
     print("$$....dev connect....$$")
-    clientMethods.checkInit()
     global client
     #Connect to server
     #client = yield tornado.websocket.websocket_connect("ws://192.168.0.106:8888/dev")

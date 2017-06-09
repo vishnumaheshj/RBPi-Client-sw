@@ -16,91 +16,84 @@
 #include  <stdio.h>
 #include  <stdlib.h>
 #include  <sys/types.h>
+#include  <sys/types.h>
 #include  <sys/ipc.h>
-#include  <sys/shm.h>
+#include  <sys/msg.h>
 #include  <unistd.h>
 #include  <string.h>
+#include  <stdint.h>
 #include "switchboard.h"
 
-#define  NOT_READY  -1
-#define  FILLED     1
-#define  TAKEN      0
-
-struct Memory {
-	int  status;
-	char data[256];
+struct msgq_buf {
+    long mtype;
+	sbMessage_t msg;
 };
+
 
 int init_write_shm()
 {
-    key_t          ShmKEY;
-    int            ShmID = -1;
-    struct Memory *ShmPTR;
+    key_t          MsgQKEY;
+    int            MsgQID = -1;
 
-    ShmKEY = ftok("/home", 'y');
-    ShmID = shmget(ShmKEY, sizeof(struct Memory), IPC_CREAT | 0666);
+    if ((MsgQKEY = ftok("/home", 'y')) == -1) {
+        perror("ftok");
+        return -1; // Need to add and handle proper error code.
+    }
+    if ((MsgQID = msgget(MsgQKEY, 0666 | IPC_CREAT)) == -1) {
+        perror("msgget");
+        return -1; // Need to add and handle proper error code.
+    }
 
-    ShmPTR = (struct Memory *) shmat(ShmID, NULL, 0);
-    memset(ShmPTR, NOT_READY, 256);
-    shmdt((void *) ShmPTR);
-
-    return ShmID;
+    return MsgQID;
 }
 
 int init_read_shm()
 {
-    key_t          ShmKEY;
-    int            ShmID = -1;
+    key_t          MsgQKEY;
+    int            MsgQID = -1;
 
-    ShmKEY = ftok("/home", 'x');
-    ShmID = shmget(ShmKEY, sizeof(struct Memory), IPC_CREAT | 0666);
+    if ((MsgQKEY = ftok("/home", 'x')) == -1) {
+        perror("ftok");
+        return -1; // Need to add and handle proper error code.
+    }
+    if ((MsgQID = msgget(MsgQKEY, 0666 | IPC_CREAT)) == -1) {
+        perror("msgget");
+        return -1; // Need to add and handle proper error code.
+    }
 
-    return ShmID;
+    return MsgQID;
 }
 
-int is_rbuf_ready_nw(int ShmID)
+int is_rbuf_ready_nw(int MsgQID)
 {
-    int ret;
-    struct Memory  *ShmPTR;
-
-    ShmPTR = (struct Memory *) shmat(ShmID, NULL, 0);
-    if (ShmPTR == NULL)
-    {
-	    ret = 0;
+    struct msqid_ds status;
+    if(msgctl(MsgQID, MSG_STAT, &status) == -1) {
+        perror("msgctl");
+        return -1; // Need to add and handle proper error code
     }
-	else if (ShmPTR->status == FILLED)
-    {
-	    ret = 1;
-    }
-	else
-    {
-	    ret = 0;
-    }
+    if(status.msg_qnum == 0)
+        return 0;
+    else
+        return 1;
 
-	shmdt((void *) ShmPTR);
-
-	return ret;
 }
 
-int read_shm(char *data, int ShmID)
+int read_shm(char *data, int MsgQID)
 {
+
+    struct msgq_buf buf;
+    buf.mtype = 0;
     int dataSize;
-    struct Memory  *ShmPTR;
     sbMessage_t *sMsg;
 
-    ShmPTR = (struct Memory *) shmat(ShmID, NULL, 0);
+    dataSize = sizeof(sbMessage_t);
+    if (msgrcv(MsgQID, &buf, dataSize, 0, 0) == -1) {
+        perror("msgrcv");
+        return -1;
+    }
 
-    if (ShmPTR == NULL)
-	    return -1;
+    sMsg = (sbMessage_t *)&buf.msg;
 
-    printf("r:waiting to be filled filled\n");
-    while (ShmPTR->status != FILLED)
-        continue;
-    printf("r:message filled\n");
-
-    sMsg = (sbMessage_t *)ShmPTR->data;
-
-	dataSize = sizeof(sbMessage_t);
 
     if (sMsg->hdr.message_type == SB_BOARD_INFO_RSP)
     {
@@ -116,9 +109,9 @@ int read_shm(char *data, int ShmID)
     }
     else if (sMsg->hdr.message_type == SB_DEVICE_INFO_NTF)
     {
-	    printf("r:dev info message.\n");
+        printf("r:dev info message.\n");
         printf("C:::r:sizeof sMsg:%lu\n", sizeof(sbMessage_t));
-		
+        
         printf("r: message type:%x\n", sMsg->hdr.message_type);
         printf("r: join state  :%x\n", sMsg->data.devInfo.joinState);
         printf("r: sbType      :%x\n", sMsg->data.devInfo.sbType.type);
@@ -139,25 +132,21 @@ int read_shm(char *data, int ShmID)
         printf("r:unknown message\n");
     }
 
-    memcpy(data, ShmPTR->data, dataSize);
-    ShmPTR->status = TAKEN;
-
-    shmdt((void *) ShmPTR);
+    memcpy(data, &buf.msg, dataSize);
     return dataSize;
 }
 
-int write_shm(char *data, int ShmID)
+int write_shm(char *data, int MsgQID)
 {
+
+    struct msgq_buf buf;
     int dataSize;
+
+    buf.mtype = 1;
     sbMessage_t *sMsg = (sbMessage_t *)data;
-    struct Memory  *ShmPTR;
+    
+    dataSize = sizeof(sbMessage_t);
 
-    ShmPTR = (struct Memory *) shmat(ShmID, NULL, 0);
-
-    if (ShmPTR == NULL)
-	    return -1;
-
-	dataSize = sizeof(sbMessage_t);
     if (sMsg->hdr.message_type == SB_BOARD_INFO_REQ)
     {
         printf("board info req\n");
@@ -175,32 +164,22 @@ int write_shm(char *data, int ShmID)
         printf("w:unknown message\n");
     }
 
-    memset(ShmPTR->data, 0, 256);
-    memcpy(ShmPTR->data, data, dataSize);
-    ShmPTR->status = FILLED;
-
-    shmdt((void *) ShmPTR);
+    memset(&buf.msg, 0, dataSize);
+    memcpy(&buf.msg, data, dataSize);
+    if (msgsnd(MsgQID, &buf, dataSize, 0) == -1) {
+        perror("msgsnd");
+        return -1;
+    }
     return dataSize;
 }
 
 
-int delete_shm(int ShmID)
+int delete_shm(int MsgQID)
 {
-    shmctl(ShmID, IPC_RMID, NULL);
+    if (msgctl(MsgQID, IPC_RMID, NULL) == -1) {
+        perror("msgctl");
+        return -1; // Need to add and handle proper error code
+    }
     return 0;
 }
 
-
-#if 0
-void  main(int  argc, char *argv[])
-{
-    int id;
-
-    id = init_shm();
-
-    update_shm(argv[1], id);
-
-    while(1)
-        continue;
-}
-#endif

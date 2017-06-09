@@ -115,17 +115,13 @@ def initializeHub():
     writeId = lib.init_write_shm()
     inMsg = sbMessage_t()
 
-    while True:
-        if lib.is_rbuf_ready_nw(readId):
-            readShm(inMsg)
-        else:
-            listenThreadEvent = SB_DEVICE_READY_REQ
+    readShm(inMsg)
 
-        if (inMsg.hdr.type == SB_DEVICE_READY_NTF):
-            listenThreadEvent = None
-            return createMessageForServer(inMsg)
-        else:
-            listenThreadEvent = SB_DEVICE_READY_REQ
+    if (inMsg.hdr.type == SB_DEVICE_READY_NTF):
+        listenThreadEvent = None
+        return createMessageForServer(inMsg)
+    else:
+        listenThreadEvent = SB_DEVICE_READY_REQ
 
 
 def sendDeviceReq(req):
