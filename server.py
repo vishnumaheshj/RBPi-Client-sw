@@ -48,17 +48,6 @@ class Devhandler(tornado.websocket.WebSocketHandler):
             else:
                print("\nunknown connection closed")
 
-class SocketHandler(tornado.websocket.WebSocketHandler):
-    def open(self):
-        print("!!!!!!! New socket connection !!!!!!!!!!!!!!\n")
-
-    def on_message(self, message):
-        print("message from browser:%s" %message)
-        self.write_message("Hai browser!!\n")
-
-    def on_close(self):
-               print("socket connection closed")
-
 
 class Userhandler(BaseHandler):
     @tornado.web.authenticated
@@ -159,7 +148,6 @@ def main():
         [
             (r"/", Mainhandler),
             (r"/dev", Devhandler),
-			(r"/socket", SocketHandler),
             (r"/user/([0-9]+)/([0-9]+)", Userhandler),
             (r"/login", LoginHandler),
             (r"/logout", LogoutHandler),

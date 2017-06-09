@@ -27,6 +27,7 @@ def createMessageForHub(Msg):
         HubReq = sbMessage_t()
         HubReq.hdr.type = SB_STATE_CHANGE_REQ
         HubReq.hdr.nodeid = int(Msg['node'])
+        HubReq.hdr.mid = int(Msg['mid'])
         if (int(Msg['sbType']) == SB_TYPE_4X4):
             HubReq.data.boardData.sbType.type = SB_TYPE_4X4
             HubReq.data.boardData.switchData.state.switch1 = int(Msg['switch1'])
