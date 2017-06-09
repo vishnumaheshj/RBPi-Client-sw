@@ -62,7 +62,13 @@ def addHub(connection, clientMessage):
                                                 }
                                      })
         else:
-            print("Hub is already active")
+            hubCollection.update_one({"hubAddr": clientMessage['hubAddr']},
+                                     {"$set":   {
+                                                   "joinTime"     : datetime.now(),
+                                                   "active"       : HS_ONLINE,
+                                                }
+                                     })
+            print("Hub is now marked as active")
     
     cursor = hubCollection.find({"hubAddr": clientMessage['hubAddr']})
     for document in cursor:
@@ -130,8 +136,25 @@ def addHubStates(clientMessage, connection):
                 }
             )
         else:
-                print("multiple hub info message of same node")
-                pass
+            hubStates.update_one({"hubAddr": cursor['hubAddr'],boardStr+".devIndex": clientMessage['devIndex']},
+                {"$set": {
+                            boardStr     : {
+                                            "devIndex"     : clientMessage['devIndex'],
+                                            "type"         : clientMessage['sbType'],
+                                            "epStatus"     : clientMessage['epStatus'],
+                                            "lastModified" : datetime.now(),
+                                            "switch1"      : clientMessage['switch1'],
+                                            "switch2"      : clientMessage['switch2'],
+                                            "switch3"      : clientMessage['switch3'],
+                                            "switch4"      : clientMessage['switch4'],
+                                            "switch5"      : clientMessage['switch5'],
+                                            "switch6"      : clientMessage['switch6'],
+                                            "switch7"      : clientMessage['switch7'],
+                                            "switch8"      : clientMessage['switch8'],
+                                            }
+                         }
+                }
+            )
 
     document = hubStates.find_one({"hubAddr": clientMessage['hubAddr']})
     if document is not None:
@@ -315,3 +338,13 @@ def findUserHub(username):
             return 0
     else:
         return 0
+
+def checkHubActive(hubAddr):
+    cursor = hubCollection.find_one({"hubAddr": hubAddr})
+    if cursor and "active" in cursor:
+            if (cursor["active"] == HS_ONLINE):
+                    return True
+            else:
+                    return False
+    else:
+            return False
