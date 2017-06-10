@@ -15,6 +15,7 @@ SB_DEVICE_INFO_NTF  = 0x09
 
 class sbMessageHdr_t(Structure):
     _fields_ = [("type", c_ubyte),
+                ("mid", c_ubyte),
                 ("nodeid",c_ubyte)]
 
 # Switch Board Types

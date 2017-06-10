@@ -9,6 +9,7 @@ hubStates = None
 hubUsers = None
 connectionList = bidict()
 
+
 def initDatabase():
     global hubCollection
     global hubStates
@@ -20,7 +21,6 @@ def initDatabase():
     hubStates = db.hubStates
     hubUsers = db.hubUsers
 
-    # Debug
     print("Database init success")
     print ("hubCollection entries:%d" % hubCollection.count())
     print ("hubStates entries:%d" % hubStates.count())
@@ -34,7 +34,6 @@ def addHub(connection, clientMessage):
     if clientMessage['message_type'] != SB_DEVICE_READY_NTF:
         return 1
 
-    #connectionList(connection) = clientMessage['hubAddr']
     connectionList[clientMessage['hubAddr']] = connection
     
     cursor = hubCollection.find_one({"hubAddr": clientMessage['hubAddr']})
@@ -78,6 +77,7 @@ def addHub(connection, clientMessage):
     print("connection list")
     print(connectionList)
     print("###############################################################")
+
 
 def addHubStates(clientMessage, connection):
     
@@ -187,6 +187,7 @@ def updateNode(connection, clientMessage):
                     }
             })
 
+
 def findNode(hubAddr, nodeid):
     boardStr = "board"+str(nodeid)
     row = hubStates.find_one({"hubAddr": hubAddr, boardStr+".devIndex": nodeid})
@@ -195,6 +196,7 @@ def findNode(hubAddr, nodeid):
             return node
     else:
             return None
+
 
 def findHub(hubAddr):
     return hubStates.find_one({"hubAddr": hubAddr})
@@ -213,6 +215,7 @@ def makeHubOffline(hubAddr):
             print("document")
             print(document)
             print("'''''''''''''''")
+
 
 def addUser(username, password):
     cursor = hubUsers.find_one({"username": username})
@@ -288,6 +291,7 @@ def logoutUser(username):
 
     return status
 
+
 def registerHub(username, hubId):
     cursor = hubUsers.find_one({"username": username})
     if cursor is not None:
@@ -311,7 +315,7 @@ def registerHub(username, hubId):
                 }
             )
  
-            status = None;
+            status = None
     else:
         print("Signup failed.Hub not registered")
         status = "Signup failed.Hub not registered"
@@ -322,6 +326,7 @@ def registerHub(username, hubId):
         print(hubsDB)
 
     return status
+
 
 def findUserHub(username):
     cursor = hubUsers.find_one({"username": username})
