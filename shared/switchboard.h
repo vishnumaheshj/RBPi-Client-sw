@@ -17,6 +17,7 @@ typedef unsigned char uint8;
 typedef struct
 {
   uint8 message_type;
+  uint8 mid;
   uint8 node_id;
 } sbMessageHdr_t;
 

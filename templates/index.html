@@ -61,7 +61,8 @@
      {% if type(values) is dict %}
      <h4><span class="label label-default">{{ escape(name.title()) }}</span></h4>
      {% if nodes[name]['type']== 0x2%}
-     <form action={{ escape("/user/"+str(hubid)+"/"+str(nodes[name]['devIndex'])) }} method="post" id="user_msg" autocomplete="off">
+	 {% set devIndex = str(nodes[name]['devIndex']) %}
+     <form action={{ escape("/user/"+str(hubid)+"/"+devIndex) }} method="post" id={{ escape("user_msg"+devIndex) }}  autocomplete="off">
       <div class="table-responsive">
        <table class="table table-hover">
         <tr>
@@ -69,11 +70,13 @@
           <span class="label label-info">Switch 1</span>
          </td>
          <td>
+          <div class="checkbox">
           {%if nodes[name]['switch1']==0 %}
-          <input type="checkbox" name="switch1" data-toggle="toggle" >
+          <input type="checkbox" name="switch1" id={{ "board" + devIndex + "switch1" }} data-toggle="toggle" >
           {%  else %}
-          <input type="checkbox" name="switch1" data-toggle="toggle" checked>
+          <input type="checkbox" name="switch1" id={{ "board" + devIndex + "switch1" }} data-toggle="toggle" checked>
           {% end %}
+          </div>
          </td>
         </tr>
         <tr>
@@ -81,11 +84,13 @@
           <span class="label label-info">Switch 2</span>
          </td>
          <td>
+          <div class="checkbox">
           {%if nodes[name]['switch2']==0 %}
-          <input type="checkbox" name="switch2" data-toggle="toggle" >
+          <input type="checkbox" name="switch2" id={{ "board" + devIndex + "switch2" }} data-toggle="toggle" >
           {%  else %}
-          <input type="checkbox" name="switch2" data-toggle="toggle" checked>
+          <input type="checkbox" name="switch2" id={{ "board" + devIndex + "switch2" }} data-toggle="toggle" checked>
           {% end %}
+          </div>
          </td>
         </tr>
         <tr>
@@ -93,11 +98,13 @@
           <span class="label label-info">Switch 3</span>
          </td>
          <td>
+          <div class="checkbox">
           {%if nodes[name]['switch3']==0 %}
-          <input type="checkbox" name="switch3" data-toggle="toggle" >
+          <input type="checkbox" name="switch3" id={{ "board" + devIndex + "switch3" }} data-toggle="toggle" >
           {% else %}
-          <input type="checkbox" name="switch3" data-toggle="toggle" checked>
+          <input type="checkbox" name="switch3" id={{ "board" + devIndex + "switch3" }} data-toggle="toggle" checked>
           {% end %}
+          </div>
          </td>
         </tr>
         <tr>
@@ -105,11 +112,13 @@
           <span class="label label-info">Switch 4</span>
          </td>
          <td>
+          <div class="checkbox">
           {%if nodes[name]['switch4']==0 %}
-          <input type="checkbox" name="switch4" data-toggle="toggle" >
+          <input type="checkbox" name="switch4" id={{ "board" + devIndex + "switch4" }} data-toggle="toggle" >
           {%  else %}
-          <input type="checkbox" name="switch4" data-toggle="toggle" checked>
+          <input type="checkbox" name="switch4" id={{ "board" + devIndex + "switch4" }} data-toggle="toggle" checked>
           {% end %}
+          </div>
          </td>
         </tr>
         <tr>
@@ -125,6 +134,9 @@
 		 <img id="loader" src="{{ static_url("images/loading.gif") }}"/>
 	   </div>
        </table>
+      <div id="modal">
+       <img id="spinimage" src="{{ static_url("images/loading.gif") }}" />
+      </div>
       </div>
      </form>
      {% else %}
@@ -147,8 +159,8 @@
    </div>
   </div>
   <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
-  <script src="{{ static_url("dist/js/bootstrap-toggle.min.js") }}"></script>
   <script src="{{ static_url("dist/js/bootstrap.min.js") }}"></script>
-  <script src="{{ static_url("site.js") }}"></script>
+  <script src="{{ static_url("dist/js/bootstrap-toggle.min.js") }}"></script>
+  <script src="{{ static_url("dist/js/site.js") }}"></script>
  </body>
 </html>
