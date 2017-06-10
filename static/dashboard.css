@@ -134,3 +134,8 @@ body {
     text-align:center;
     overflow: auto;
 }
+
+.disabledbutton {
+		    pointer-events: none;
+			    opacity: 0.4;
+}

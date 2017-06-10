@@ -70,11 +70,13 @@
           <span class="label label-info">Switch 1</span>
          </td>
          <td>
+          <div class="checkbox">
           {%if nodes[name]['switch1']==0 %}
           <input type="checkbox" name="switch1" id={{ "board" + devIndex + "switch1" }} data-toggle="toggle" >
           {%  else %}
           <input type="checkbox" name="switch1" id={{ "board" + devIndex + "switch1" }} data-toggle="toggle" checked>
           {% end %}
+          </div>
          </td>
         </tr>
         <tr>
@@ -82,11 +84,13 @@
           <span class="label label-info">Switch 2</span>
          </td>
          <td>
+          <div class="checkbox">
           {%if nodes[name]['switch2']==0 %}
           <input type="checkbox" name="switch2" id={{ "board" + devIndex + "switch2" }} data-toggle="toggle" >
           {%  else %}
           <input type="checkbox" name="switch2" id={{ "board" + devIndex + "switch2" }} data-toggle="toggle" checked>
           {% end %}
+          </div>
          </td>
         </tr>
         <tr>
@@ -94,11 +98,13 @@
           <span class="label label-info">Switch 3</span>
          </td>
          <td>
+          <div class="checkbox">
           {%if nodes[name]['switch3']==0 %}
           <input type="checkbox" name="switch3" id={{ "board" + devIndex + "switch3" }} data-toggle="toggle" >
           {% else %}
           <input type="checkbox" name="switch3" id={{ "board" + devIndex + "switch3" }} data-toggle="toggle" checked>
           {% end %}
+          </div>
          </td>
         </tr>
         <tr>
@@ -106,11 +112,13 @@
           <span class="label label-info">Switch 4</span>
          </td>
          <td>
+          <div class="checkbox">
           {%if nodes[name]['switch4']==0 %}
           <input type="checkbox" name="switch4" id={{ "board" + devIndex + "switch4" }} data-toggle="toggle" >
           {%  else %}
           <input type="checkbox" name="switch4" id={{ "board" + devIndex + "switch4" }} data-toggle="toggle" checked>
           {% end %}
+          </div>
          </td>
         </tr>
         <tr>
