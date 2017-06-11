@@ -2,6 +2,7 @@
  * Created on 06/06/17.
  */
 
+var globalSocketID = 0;
 
 $('document').ready(function(){
     var sock = new SockJS('http://localhost:8888/socket');
@@ -10,7 +11,10 @@ $('document').ready(function(){
     };
 
     sock.onmessage = function(e) {
-        alert('message:'+ e.data);
+        if (e.data['type'] == 'init') {
+            globalSocketID = e.data['socketId'];
+            alert("new socket:"+globalSocketID);
+        }
     };
 
     sock.onclose = function() {
@@ -62,7 +66,7 @@ $("[id^=user_msg]").submit(function(e) {
     $.ajax({
            type: $(this).attr('method'),
            url:  $(this).attr('action'),
-           data: $(this).serialize(), // serializes the form's elements.
+           data: $(this).serializeArray().push({name:'socketId', value:globalSocketID}), // serializes the form's elements.
            success: function(data)
            {
                 //$(this).find('.checkbox').removeClass('disabled');
