@@ -17,17 +17,14 @@ from time import time
 from hashlib import md5
 from random import random
 
-class BrowserConnect(SockJSConnection):
-    def __init__(self, id):
-        self.socketId = id
 
-
-class SocketConnection(BrowserConnect):
+class SocketConnection(SockJSConnection):
     def on_open(self, request):
         i = md5()
         i.update('%s%s' % (random(), time()))
-        self.socketId = i.hexdigest()
-        print("New socket connection. id:" % self.socketId)
+        socketId = i.hexdigest()
+        print("New socket connection. id:%s" % socketId)
+        self.send({'type':'init', 'socketId': socketId})
 
     def on_message(self, msg):
         print("message came from browser socket: %s" % msg)
@@ -93,6 +90,9 @@ class Userhandler(BaseHandler):
     def post(self, hubAddr, nodeid):
         print("Message from user %s, hubAddr:%s nodeid:%s" %(self.current_user, hubAddr, nodeid))
         found = 0
+        sid = self.get_argument('socketId', default=None)
+        if sid is not None:
+            print("socket id of ajax request:%d" % sid)
 
         # ADD CHECK FOR HUB IN USER DATABASE.
         #device = serverDB.findUserHub(self.current_user)

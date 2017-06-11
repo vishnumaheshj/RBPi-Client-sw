@@ -2,7 +2,7 @@ from switchboard import *
 import json
 import serverDB
 
-messageList = []
+messageList = {}
 messageNum = 0
 
 
