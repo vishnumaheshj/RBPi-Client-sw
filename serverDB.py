@@ -8,6 +8,7 @@ hubCollection = None
 hubStates = None
 hubUsers = None
 connectionList = bidict()
+socketList = bidict()
 
 
 def initDatabase():
@@ -64,8 +65,9 @@ def addHub(connection, clientMessage):
         else:
             hubCollection.update_one({"hubAddr": clientMessage['hubAddr']},
                                      {"$set":   {
-                                                   "joinTime"     : datetime.now(),
-                                                   "active"       : HS_ONLINE,
+                                                    "joinTime"     : datetime.now(),
+                                                    "active"       : HS_ONLINE,
+                                                    "offlineSince" : 0,
                                                 }
                                      })
             print("Hub is now marked as active")
