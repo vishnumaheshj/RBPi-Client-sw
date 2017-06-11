@@ -1,6 +1,24 @@
 /**
  * Created on 06/06/17.
  */
+
+
+$('document').ready(function(){
+    var sock = new SockJS('http://localhost:8888/socket');
+    sock.onopen = function() {
+        ;
+    };
+
+    sock.onmessage = function(e) {
+        alert('message:'+ e.data);
+    };
+
+    sock.onclose = function() {
+        alert('closed');
+    };
+});
+
+
 function processAndToggle(data) {
     // Dummy data1 to see working of javascript..
     var data1 = '{"_id": {"$oid": "5938405d23ea620c8afa93f4"}, "hubAddr": 72623859790382856, "board1": {"switch8": 4, "devIndex": 1, "switch3": 1, "lastModified": {"$date": 1496953485725}, "switch1": 1, "switch7": 4, "switch6": 4, "switch5": 4, "switch4": 0, "epStatus": 5, "switch2": 0, "type": 2}, "totalNodes": 1}'

@@ -1,16 +1,17 @@
-import switchboard
 from switchboard import *
 import json
 import serverDB
 
-activeList =  {}
-activeNum = 1
+messageList = []
+messageNum = 0
+
 
 def sentBoardInfoReq(nodeid):
     Msg = {'message_type': SB_BOARD_INFO_REQ}
     Msg['node'] = nodeid
     Msg['flags'] = 0
     return Msg
+
 
 def sentStateChangeReq(nodeid, sbtype, self):
     Msg = {'message_type': SB_STATE_CHANGE_REQ}
@@ -31,11 +32,12 @@ def sentStateChangeReq(nodeid, sbtype, self):
         Msg['switch8'] = SW_DONT_CARE
     return Msg
 
+
 def informWebClient(message):
     mid = message['mid']
     print("mid is %d:" %mid)
-    if mid in activeList:
-        activeList[mid] = 1
+    if mid in messageList:
+        messageList[mid] = 1
     else:
         print("NO ACTIVE REQUEST FOUND FOR RESPONSE")
 

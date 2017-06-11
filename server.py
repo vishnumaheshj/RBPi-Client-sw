@@ -11,6 +11,41 @@ import serverDB
 from bson import json_util
 from tornado import gen
 import json
+from sockjs.tornado import SockJSRouter, SockJSConnection
+from sets import Set
+from time import time
+from hashlib import md5
+from random import random
+
+class BrowserConnect(SockJSConnection):
+    def __init__(self, id):
+        self.socketId = id
+
+
+class SocketConnection(BrowserConnect):
+    def on_open(self, request):
+        i = md5()
+        i.update('%s%s' % (random(), time()))
+        self.socketId = i.hexdigest()
+        print("New socket connection. id:" % self.socketId)
+
+    def on_message(self, msg):
+        print("message came from browser socket: %s" % msg)
+        # Authentication to be added
+        user = 'test' # Dummy, to be passed from browser
+
+        if user not in serverDB.socketList:
+            serverDB.socketList[user] = Set()
+        serverDB.socketList[user].add(self)
+        print("socket list")
+        print(serverDB.socketList)
+
+    def on_close(self):
+        print("socket connection closed")
+        # Find user
+        user = 'test' # Dummy
+        if self in serverDB.socketList[user]:
+            serverDB.socketList[user].remove(self)
 
 
 class BaseHandler(tornado.web.RequestHandler):
@@ -73,11 +108,11 @@ class Userhandler(BaseHandler):
                 if boardStr in nodeList:
                     node = nodeList[boardStr]
                     Msg = serverMethods.sentStateChangeReq(node['devIndex'], node['type'], self)
-                    serverMethods.activeNum = serverMethods.activeNum + 1
-                    serverMethods.activeList[serverMethods.activeNum] = 0
+                    serverMethods.messageNum += 1       #
+                    serverMethods.messageList[serverMethods.messageNum] = 0
                     
                     print("sent state change")
-                    Msg.update({'mid': serverMethods.activeNum})
+                    Msg.update({'mid': serverMethods.messageNum})
                     print(Msg)
                     conn.write_message(Msg)
                     found = 1
@@ -89,16 +124,17 @@ class Userhandler(BaseHandler):
             # Async Wait for info response.
             # Fetch and send result.
             i = 0
-            while(i < 20 and serverMethods.activeList[serverMethods.activeNum] == 0):
+            while (i < 20 and serverMethods.messageList[serverMethods.messageNum] == 0):
                 yield gen.sleep(0.2)
-                i = i + 1
+                i += 1
             print("yield sleep sec(s),active list is")
-            print(serverMethods.activeList)
+            print(serverMethods.messageList)
             print(i/5)
-            del serverMethods.activeList[serverMethods.activeNum]
+            del serverMethods.messageList[serverMethods.messageNum]
             
             nodeList = serverDB.findHub(int(hubAddr))
             self.write(json.dumps(nodeList, default=json_util.default))
+
 
 class LoginHandler(BaseHandler):
     def get(self):
@@ -148,8 +184,11 @@ class SignupHandler(BaseHandler):
         else:
             self.render("login.html", logintype = "signup", errorString = error)
 
+
 def main():
+    SocketRouter = SockJSRouter(SocketConnection, '/socket')
     app = tornado.web.Application(
+        SocketRouter.urls +
         [
             (r"/", Mainhandler),
             (r"/dev", Devhandler),
