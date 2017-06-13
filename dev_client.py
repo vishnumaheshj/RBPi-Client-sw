@@ -7,6 +7,8 @@ import ctypes
 import subprocess
 from threading import Thread
 from time import sleep
+import switchboard
+from switchboard import *
 
 #globals
 client = None
@@ -93,9 +95,14 @@ def dev_connect():
         print("From dev connect:%s" % msg)
         if msg:
             Msg = json.loads(msg)
-            Req = clientMethods.createMessageForHub(Msg)
-            clientMethods.writeShm(Req)
-            print("From dev connect: send to hub")
+            if Msg['message_type'] == SB_KEEP_ALIVE:
+                client.write_message(msg)
+                print("From dev connect: send keep alive resp")
+                
+            else:
+                Req = clientMethods.createMessageForHub(Msg)
+                clientMethods.writeShm(Req)
+                print("From dev connect: send to hub")
         else:
             yield connect_server()
     client.close()
