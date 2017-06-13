@@ -147,15 +147,19 @@ class SignupHandler(BaseHandler):
         print("password %s" % password)
         print("HudId %d" % hubid)
 
-        error = serverDB.addUser(username, password)
+        error = serverDB.checkHubValid(hubid)
         if not error:
-            error = serverDB.registerHub(username, hubid)
+            error = serverDB.addUser(username, password)
             if not error:
-                self.redirect("/login")
+                error = serverDB.registerHub(username, hubid)
+                if not error:
+                    self.redirect("/login")
+                else:
+                    self.render("login.html", logintype = "signup", errorString = error)
             else:
                 self.render("login.html", logintype = "signup", errorString = error)
         else:
-            self.render("login.html", logintype = "signup", errorString = error)
+               self.render("login.html", logintype = "signup", errorString = error)
 
 def main():
     app = tornado.web.Application(
