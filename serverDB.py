@@ -295,8 +295,6 @@ def logoutUser(username):
 
 def checkHubValid(hubId):
     global validHubs
-    for document in validHubs.find():
-            print(document)
     cursor = validHubs.find_one({"hubAddr": hubId})
     if cursor is None:
             status = "Hub ID is not valid"
