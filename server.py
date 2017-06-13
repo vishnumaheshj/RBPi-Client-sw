@@ -35,7 +35,6 @@ class Mainhandler(BaseHandler):
 class Devhandler(tornado.websocket.WebSocketHandler):
     def open(self):
         print("New device connection\n")
-        self.write_message("Server accepted connection\n")
 
     def on_message(self, message):
         serverMethods.processMsgFromClient(self, message)

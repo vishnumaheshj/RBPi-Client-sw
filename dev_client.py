@@ -6,11 +6,13 @@ import json
 import ctypes
 import subprocess
 from threading import Thread
+from time import sleep
 
+#globals
 client = None
-
 #Global variable to ensure that client connects to server only after successfully initializing ZNP 
 binary_init_status = 0
+dev_ready_ntf = {}
 
 #Method to run ZNP init binary
 def execute_binary():
@@ -30,14 +32,9 @@ def execute_binary():
 
 def listen_hub():
     print("@@..listening hub..@@")
+    global dev_ready_ntf
     inMsg = clientMethods.sbMessage_t()
-    serReq = clientMethods.initializeHub()
-    print("listenHub:%s", json.dumps(serReq))
-    while (client == None):
-            continue
-    print("listenHub:clientHandle Ready")
-    client.write_message(json.dumps(serReq))
-    print("listenHub:Sent Device Ready..!!!!!@~~~~~~")
+    dev_ready_ntf = clientMethods.initializeHub()
     while True:
         clientMethods.readShm(inMsg)
         print("listenHub:new message")
@@ -45,6 +42,23 @@ def listen_hub():
         client.write_message(json.dumps(serReq))
         print("listenHub:send message")
         continue 
+
+@gen.coroutine
+def connect_server():
+    global client
+    client = None
+    while client is None:
+        try:
+            client = yield tornado.websocket.websocket_connect("ws://localhost:8888/dev")
+            #client = yield tornado.websocket.websocket_connect("ws://192.168.0.106:8888/dev")
+            #client = yield tornado.websocket.websocket_connect("ws://dotslash.herokuapp.com/dev")
+        except:
+            print("Connection Refused try again in 5")
+            sleep(5)
+        else:
+                global dev_ready_ntf
+                client.write_message(json.dumps(dev_ready_ntf))
+                print("Connection established")
 
 @gen.coroutine
 def dev_connect():
@@ -67,13 +81,13 @@ def dev_connect():
     thread.daemon = True
     thread.start()
     
-    print("$$....dev connect....$$")
+    global dev_ready_ntf 
     global client
-    #Connect to server
-    #client = yield tornado.websocket.websocket_connect("ws://192.168.0.106:8888/dev")
-    client = yield tornado.websocket.websocket_connect("ws://localhost:8888/dev")
-    msg = yield client.read_message()
-    print("From dev connect:%s" % msg)
+    while not dev_ready_ntf:
+            sleep(1)
+            continue
+    yield connect_server()
+    print("$$....dev connect....$$")
     while 1:
         msg = yield client.read_message()
         print("From dev connect:%s" % msg)
@@ -82,7 +96,8 @@ def dev_connect():
             Req = clientMethods.createMessageForHub(Msg)
             clientMethods.writeShm(Req)
             print("From dev connect: send to hub")
-        continue
+        else:
+            yield connect_server()
     client.close()
 
 if __name__ == "__main__":
