@@ -8,6 +8,8 @@ import tornado.ioloop
 import tornado.web
 import serverMethods
 import serverDB
+import switchboard
+from switchboard import *
 from bson import json_util
 from tornado import gen
 import json
@@ -78,7 +80,13 @@ class Mainhandler(BaseHandler):
 class Devhandler(tornado.websocket.WebSocketHandler):
     def open(self):
         print("New device connection\n")
-        self.write_message("Server accepted connection\n")
+        self.callback = tornado.ioloop.PeriodicCallback(self.keep_alive, 40000)
+        self.callback.start()
+    
+    def keep_alive(self):
+        Msg = {'message_type' : SB_KEEP_ALIVE}
+        print("sending keep alive")
+        self.write_message(Msg)
 
     def on_message(self, message):
         serverMethods.processMsgFromClient(self, message)
@@ -93,6 +101,7 @@ class Devhandler(tornado.websocket.WebSocketHandler):
                 print(serverDB.connectionList)
             else:
                print("\nunknown connection closed")
+            self.callback.stop()
 
 
 class Userhandler(BaseHandler):
@@ -194,15 +203,19 @@ class SignupHandler(BaseHandler):
         print("password %s" % password)
         print("HudId %d" % hubid)
 
-        error = serverDB.addUser(username, password)
+        error = serverDB.checkHubValid(hubid)
         if not error:
-            error = serverDB.registerHub(username, hubid)
+            error = serverDB.addUser(username, password)
             if not error:
-                self.redirect("/login")
+                error = serverDB.registerHub(username, hubid)
+                if not error:
+                    self.redirect("/login")
+                else:
+                    self.render("login.html", logintype = "signup", errorString = error)
             else:
                 self.render("login.html", logintype = "signup", errorString = error)
         else:
-            self.render("login.html", logintype = "signup", errorString = error)
+               self.render("login.html", logintype = "signup", errorString = error)
 
 
 def main():
