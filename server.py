@@ -81,7 +81,7 @@ class Devhandler(tornado.websocket.WebSocketHandler):
     def open(self):
         print("New device connection\n")
         self.callback = tornado.ioloop.PeriodicCallback(self.keep_alive, 40000)
-        self.callback.start()
+        #self.callback.start()
     
     def keep_alive(self):
         Msg = {'message_type' : SB_KEEP_ALIVE}
@@ -101,7 +101,14 @@ class Devhandler(tornado.websocket.WebSocketHandler):
                 print(serverDB.connectionList)
             else:
                print("\nunknown connection closed")
-            self.callback.stop()
+            #self.callback.stop()
+
+    def on_ping(self, data):
+        print("received ping")
+
+    def on_pong(self, data):
+        print("received ping reply")
+
 
 
 class Userhandler(BaseHandler):
@@ -236,6 +243,8 @@ def main():
         login_url = "/login",
         xsrf_cookies = "True",
         degug = "True",
+        websocket_ping_interval = 10,
+        websocket_ping_timeout = 30,
     )
     serverDB.initDatabase()
     http_server = tornado.httpserver.HTTPServer(app)
