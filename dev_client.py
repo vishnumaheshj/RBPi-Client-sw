@@ -55,10 +55,9 @@ def connect_server():
     client = None
     while client is None:
         try:
-            #client = yield tornado.websocket.websocket_connect("ws://localhost:8888/dev")
-            #client = yield tornado.websocket.websocket_connect("ws://192.168.0.106:8888/dev")
-            client = yield tornado.websocket.websocket_connect("ws://dotslash.co/dev", ping_interval=10,
-                                                               ping_timeout=30)
+            client = yield tornado.websocket.websocket_connect("ws://localhost:8888/dev")
+            # client = yield tornado.websocket.websocket_connect("ws://192.168.0.106:8888/dev")
+            #client = yield tornado.websocket.websocket_connect("ws://dotslash.co/dev")
         except:
             print("Connection Refused try again in 5")
             sleep(5)
@@ -100,14 +99,9 @@ def dev_connect():
         print("From dev connect:%s" % msg)
         if msg:
             Msg = json.loads(msg)
-            if Msg['message_type'] == SB_KEEP_ALIVE:
-                client.write_message(msg)
-                print("From dev connect: send keep alive resp")
-                
-            else:
-                Req = clientMethods.createMessageForHub(Msg)
-                clientMethods.writeShm(Req)
-                print("From dev connect: send to hub")
+            Req = clientMethods.createMessageForHub(Msg)
+            clientMethods.writeShm(Req)
+            print("From dev connect: send to hub")
         else:
             yield connect_server()
     client.close()
