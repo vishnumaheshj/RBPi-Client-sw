@@ -12,6 +12,7 @@ SB_DEVICE_READY_REQ = 0x06
 SB_DEVICE_TYPE_REQ  = 0x07
 SB_DEVICE_TYPE_NTF  = 0x08
 SB_DEVICE_INFO_NTF  = 0x09
+SB_KEEP_ALIVE       = 0x0A
 
 class sbMessageHdr_t(Structure):
     _fields_ = [("type", c_ubyte),

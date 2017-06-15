@@ -15,12 +15,14 @@ def initDatabase():
     global hubCollection
     global hubStates
     global hubUsers
+    global validHubs
 
     client = MongoClient()
     db = client.dotslash
     hubCollection = db.hubs
     hubStates = db.hubStates
     hubUsers = db.hubUsers
+    validHubs = db.validHubs
 
     print("Database init success")
     print ("hubCollection entries:%d" % hubCollection.count())
@@ -291,6 +293,15 @@ def logoutUser(username):
         print("user database")
         print(userDB)
 
+    return status
+
+def checkHubValid(hubId):
+    global validHubs
+    cursor = validHubs.find_one({"hubAddr": hubId})
+    if cursor is None:
+            status = "Hub ID is not valid"
+    else:
+            status = None
     return status
 
 
