@@ -23,26 +23,37 @@ class SocketConnection(SockJSConnection):
         i = md5()
         i.update('%s%s' % (random(), time()))
         socketId = i.hexdigest()
-        print("New socket connection. id:%s" % socketId)
-        self.send({'type':'init', 'socketId': socketId})
+        self.socketID = socketId
+        self.authenticated = False
+        print("New socket connection. id:%s" % self.socketID)
+        self.send(json.dumps({'type':'init', 'socketId': socketId}))
 
     def on_message(self, msg):
         print("message came from browser socket: %s" % msg)
-        # Authentication to be added
-        user = 'test' # Dummy, to be passed from browser
+        msg = json.loads(msg)
+        if msg['socketId'] != self.socketID:
+            return False
 
-        if user not in serverDB.socketList:
-            serverDB.socketList[user] = Set()
-        serverDB.socketList[user].add(self)
+        if not self.authenticated and msg['type'] != 'auth':
+            return False
+        elif msg['type'] == 'auth':
+            # Authentication to be added
+            self.user = msg['user']
+            self.authenticated = True
+            if self.user not in serverDB.socketList:
+                serverDB.socketList[self.user] = []
+            serverDB.socketList[self.user].append(self)
+
         print("socket list")
         print(serverDB.socketList)
 
     def on_close(self):
         print("socket connection closed")
-        # Find user
-        user = 'test' # Dummy
-        if self in serverDB.socketList[user]:
-            serverDB.socketList[user].remove(self)
+        if self.user in serverDB.socketList:
+            if self in serverDB.socketList[self.user]:
+                serverDB.socketList[self.user].remove(self)
+        print("socket list")
+        print(serverDB.socketList)
 
 
 class BaseHandler(tornado.web.RequestHandler):
@@ -90,9 +101,10 @@ class Userhandler(BaseHandler):
     def post(self, hubAddr, nodeid):
         print("Message from user %s, hubAddr:%s nodeid:%s" %(self.current_user, hubAddr, nodeid))
         found = 0
+        print(self.request.arguments)
         sid = self.get_argument('socketId', default=None)
         if sid is not None:
-            print("socket id of ajax request:%d" % sid)
+            print("socket id of ajax request:%s" % sid)
 
         # ADD CHECK FOR HUB IN USER DATABASE.
         #device = serverDB.findUserHub(self.current_user)
@@ -133,7 +145,15 @@ class Userhandler(BaseHandler):
             del serverMethods.messageList[serverMethods.messageNum]
             
             nodeList = serverDB.findHub(int(hubAddr))
-            self.write(json.dumps(nodeList, default=json_util.default))
+            msg = json.dumps(nodeList, default=json_util.default)
+            self.write(msg)
+            # Update other clients...
+            nodeList['serverPush'] = 'stateChange'
+            nodeList['socketId'] = sid
+            msg = json.dumps(nodeList, default=json_util.default)
+            print("sending to users:%d" % len(serverDB.socketList[self.current_user]))
+            SocketConnection.broadcast(serverDB.socketList[self.current_user][0], serverDB.socketList[self.current_user], msg)
+
 
 
 class LoginHandler(BaseHandler):
