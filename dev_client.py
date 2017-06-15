@@ -35,12 +35,16 @@ def execute_binary():
 def listen_hub():
     print("@@..listening hub..@@")
     global dev_ready_ntf
+    global client
     inMsg = clientMethods.sbMessage_t()
     dev_ready_ntf = clientMethods.initializeHub()
     while True:
         clientMethods.readShm(inMsg)
         print("listenHub:new message")
         serReq = clientMethods.createMessageForServer(inMsg)
+        while client is None:
+            sleep(1)
+            continue
         client.write_message(json.dumps(serReq))
         print("listenHub:send message")
         continue 
@@ -51,9 +55,9 @@ def connect_server():
     client = None
     while client is None:
         try:
-            client = yield tornado.websocket.websocket_connect("ws://localhost:8888/dev")
+            #client = yield tornado.websocket.websocket_connect("ws://localhost:8888/dev")
             #client = yield tornado.websocket.websocket_connect("ws://192.168.0.106:8888/dev")
-            #client = yield tornado.websocket.websocket_connect("ws://dotslash.herokuapp.com/dev")
+            client = yield tornado.websocket.websocket_connect("ws://dotslash.co/dev")
         except:
             print("Connection Refused try again in 5")
             sleep(5)
