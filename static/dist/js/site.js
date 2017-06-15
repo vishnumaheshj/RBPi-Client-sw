@@ -10,7 +10,7 @@ return r ? r[1] : undefined;
 var globalSocketID = 0;
 
 $('document').ready(function(){
-    var sock = new SockJS('http://localhost:8888/socket');
+    var sock = new SockJS(window.location.href+'socket');
     sock.onopen = function() {
         ;
     };
