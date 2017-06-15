@@ -8,7 +8,7 @@ hubCollection = None
 hubStates = None
 hubUsers = None
 connectionList = bidict()
-socketList = bidict()
+socketList = dict()
 
 
 def initDatabase():

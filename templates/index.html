@@ -27,7 +27,7 @@
        <form action="/logout" method="post" id="logout" class="navbar-form navbar-right">
         {% module xsrf_form_html() %}
         <div class="form-group">
-         <input type="hidden" name="username" value={{ handler.current_user }}>
+         <input type="hidden" name="username" id="username" value={{ handler.current_user }}>
          <button class="btn btn-sm btn-primary btn-block" type="submit">Logout</button>
         </div>
        </form>
