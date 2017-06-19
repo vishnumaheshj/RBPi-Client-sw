@@ -124,6 +124,7 @@
         <tr>
          <td>
           <input type="hidden" name="next" value="{{ request.path }}">
+          <input type="hidden" name="sessionId" id="sessionId" value="{{ self.sessionId }}">
           {% module xsrf_form_html() %}
           <button class="btn btn-sm btn-primary " onclick="loadSpiral()" type="submit">Update</button>
          </td>

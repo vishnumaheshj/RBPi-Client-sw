@@ -9,6 +9,7 @@ hubStates = None
 hubUsers = None
 connectionList = bidict()
 socketList = dict()
+sessionList = dict()
 
 
 def initDatabase():

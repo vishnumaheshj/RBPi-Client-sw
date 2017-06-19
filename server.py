@@ -14,7 +14,6 @@ from bson import json_util
 from tornado import gen
 import json
 from sockjs.tornado import SockJSRouter, SockJSConnection
-from sets import Set
 from time import time
 from hashlib import md5
 from random import random
@@ -28,7 +27,7 @@ class SocketConnection(SockJSConnection):
         self.socketID = socketId
         self.authenticated = False
         print("New socket connection. id:%s" % self.socketID)
-        self.send(json.dumps({'type':'init', 'socketId': socketId}))
+        self.send(json.dumps({'type': 'init', 'socketId': socketId}))
 
     def on_message(self, msg):
         print("message came from browser socket: %s" % msg)
@@ -37,11 +36,20 @@ class SocketConnection(SockJSConnection):
             return False
 
         if not self.authenticated and msg['type'] != 'auth':
+            self.send(json.dumps({'type': 'error'}))
             return False
         elif msg['type'] == 'auth':
-            # Authentication to be added
-            self.user = msg['user']
-            self.authenticated = True
+            # session ID Authentication.
+            self.sessionId = msg['sessionId']
+            if self.sessionId not in serverDB.sessionList[self.user]:
+                # Force a page refresh at the client side to start a new session,
+                # As the requested session is not found.
+                self.send(json.dumps({'type': 'error'}))
+                return False
+            else:
+                self.user = msg['user']
+                self.authenticated = True
+
             if self.user not in serverDB.socketList:
                 serverDB.socketList[self.user] = []
             serverDB.socketList[self.user].append(self)
@@ -56,6 +64,14 @@ class SocketConnection(SockJSConnection):
                 serverDB.socketList[self.user].remove(self)
         print("socket list")
         print(serverDB.socketList)
+
+        if self.user in serverDB.sessionList:
+            if self.sessionId in serverDB.sessionList[self.user]:
+                serverDB.sessionList[self.user].remove(self.sessionId)
+        print("session closed")
+        print("session list")
+        print(serverDB.sessionList)
+
 
 
 class BaseHandler(tornado.web.RequestHandler):
@@ -72,9 +88,17 @@ class Mainhandler(BaseHandler):
         if device:
             nodeList = serverDB.findHub(device)
 
+        i = md5()
+        i.update('%s%s' % (random(), time()))
+        sessionId = i.hexdigest()
+        if self.current_user not in serverDB.sessionList:
+            serverDB.sessionList[self.current_user] = []
+        serverDB.sessionList[self.current_user].append(sessionId)
+
         if serverDB.checkHubActive(device) is False:
             device = 0
-        self.render("index.html", nodes = nodeList, hubid = device)
+
+        self.render("index.html", nodes=nodeList, hubid=device, sessionId=sessionId)
 
 
 class Devhandler(tornado.websocket.WebSocketHandler):
@@ -102,12 +126,11 @@ class Devhandler(tornado.websocket.WebSocketHandler):
         print("received ping reply")
 
 
-
 class Userhandler(BaseHandler):
     @tornado.web.authenticated
     @gen.coroutine
     def post(self, hubAddr, nodeid):
-        print("Message from user %s, hubAddr:%s nodeid:%s" %(self.current_user, hubAddr, nodeid))
+        print("Message from user %s, hubAddr:%s nodeid:%s" % (self.current_user, hubAddr, nodeid))
         found = 0
         print(self.request.arguments)
         sid = self.get_argument('socketId', default=None)
@@ -189,6 +212,7 @@ class LogoutHandler(BaseHandler):
         serverDB.logoutUser(username)
         self.clear_cookie("username")
         self.redirect("/")
+
 
 class SignupHandler(BaseHandler):
     def get(self):
