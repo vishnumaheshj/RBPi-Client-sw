@@ -41,13 +41,13 @@ class SocketConnection(SockJSConnection):
         elif msg['type'] == 'auth':
             # session ID Authentication.
             self.sessionId = msg['sessionId']
+            self.user = msg['user']
             if self.sessionId not in serverDB.sessionList[self.user]:
                 # Force a page refresh at the client side to start a new session,
                 # As the requested session is not found.
                 self.send(json.dumps({'type': 'error'}))
                 return False
             else:
-                self.user = msg['user']
                 self.authenticated = True
 
             if self.user not in serverDB.socketList:
