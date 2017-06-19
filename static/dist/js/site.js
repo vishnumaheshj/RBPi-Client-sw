@@ -21,8 +21,9 @@ $('document').ready(function(){
             globalSocketID = data['socketId'];
 
             var username = document.getElementById('username').value;
+            var sessionId = document.getElementById('sessionId').value;
             //alert("user:"+username);
-            msg =   {'type':'auth', 'socketId': globalSocketID, 'user': username,};
+            msg =   {'type':'auth', 'socketId': globalSocketID, 'user': username, 'sessionId': sessionId};
             sock.send(JSON.stringify(msg));
         }
         else if (data['serverPush'] == 'stateChange') {

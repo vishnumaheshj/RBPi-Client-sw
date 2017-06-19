@@ -16,6 +16,7 @@ client = None
 binary_init_status = 0
 dev_ready_ntf = {}
 
+
 #Method to run ZNP init binary
 def execute_binary():
     global binary_init_status
@@ -31,6 +32,7 @@ def execute_binary():
                 break
             if b'Done' in line:
                 binary_init_status = 1
+
 
 def listen_hub():
     print("@@..listening hub..@@")
@@ -49,6 +51,7 @@ def listen_hub():
         print("listenHub:send message")
         continue 
 
+
 @gen.coroutine
 def connect_server():
     global client
@@ -65,6 +68,7 @@ def connect_server():
                 global dev_ready_ntf
                 client.write_message(json.dumps(dev_ready_ntf))
                 print("Connection established")
+
 
 @gen.coroutine
 def dev_connect():
