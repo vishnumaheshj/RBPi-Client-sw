@@ -33,6 +33,26 @@ def sentStateChangeReq(nodeid, sbtype, self):
     return Msg
 
 
+def sentStateChangeReqForApp(nodeid, sbtype, message):
+    Msg = {'message_type': SB_STATE_CHANGE_REQ}
+    Msg['node'] = nodeid
+    if(sbtype == SB_TYPE_4X4):
+        switch1 = message['switch1']
+        switch2 = message['switch2']
+        switch3 = message['switch3']
+        switch4 = message['switch4']
+        Msg['sbType'] = SB_TYPE_4X4
+        Msg['switch1'] = SW_TURN_ON if (switch1 == 'on') else SW_TURN_OFF
+        Msg['switch2'] = SW_TURN_ON if (switch2 == 'on') else SW_TURN_OFF
+        Msg['switch3'] = SW_TURN_ON if (switch3 == 'on') else SW_TURN_OFF
+        Msg['switch4'] = SW_TURN_ON if (switch4 == 'on') else SW_TURN_OFF
+        Msg['switch5'] = SW_DONT_CARE
+        Msg['switch6'] = SW_DONT_CARE
+        Msg['switch7'] = SW_DONT_CARE
+        Msg['switch8'] = SW_DONT_CARE
+    return Msg
+
+
 def informWebClient(message):
     mid = message['mid']
     print("mid is %d:" %mid)
