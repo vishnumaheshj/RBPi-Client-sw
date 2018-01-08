@@ -20,5 +20,5 @@
 # For more information see the manual pages of crontab(5) and cron(8)
 #
 # m h  dom mon dow   command
-@reboot rm -f /home/pi/dotslash/tornado_backend/JoinedDevices
-@reboot python /home/pi/dotslash/tornado_backend/dev_client.py > /home/pi/dotslash/logs 2>&1
+@reboot rm -f /home/pi/dotslash/client/JoinedDevices
+@reboot python /home/pi/dotslash/client/dev_client.py > /home/pi/dotslash/logs 2>&1
