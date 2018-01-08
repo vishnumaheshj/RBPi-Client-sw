@@ -44,7 +44,7 @@ class AppSocketConnection(SockJSConnection):
                 self.authenticated = True
                 print("App Client Authenticated")
             else:
-                self.send(json.dumps({'type': 'error', 'reason': 'auth fail'}))
+                self.send(json.dumps({'type': 'error', 'reason': 'auth_fail'}))
                 return False
             if self.user not in serverDB.appSocketList:
                 serverDB.appSocketList[self.user] = []
@@ -54,7 +54,7 @@ class AppSocketConnection(SockJSConnection):
             nodeList = {}
             if device:
                 nodeList = serverDB.findHub(device)
-            nodeList['serverPush'] = 'stateChange'
+            nodeList['type'] = 'stateChange'
             if '_id' in nodeList:
                 del nodeList['_id']
             if serverDB.checkHubActive(device) is False:
@@ -68,6 +68,7 @@ class AppSocketConnection(SockJSConnection):
             print("Got singleSwitchUpdate from App")
             print(hubAddr)
             print(nodeid)
+            found = 0
 
             if int(hubAddr) in serverDB.connectionList:
                 conn = serverDB.connectionList[int(hubAddr)]
@@ -105,7 +106,7 @@ class AppSocketConnection(SockJSConnection):
                 nodeList = serverDB.findHub(int(hubAddr))
 
                 # Update All clients...
-                nodeList['serverPush'] = 'stateChange'
+                nodeList['type'] = 'stateChange'
                 nodeList['socketId'] = 0
                 nodeList['appSocketID'] = self.appSocketID
                 if '_id' in nodeList:
@@ -125,7 +126,6 @@ class AppSocketConnection(SockJSConnection):
         if self.user in serverDB.appSocketList:
             if self in serverDB.appSocketList[self.user]:
                 serverDB.appSocketList[self.user].remove(self)
-
 
 class SocketConnection(SockJSConnection):
     def on_open(self, request):
@@ -211,7 +211,7 @@ class Mainhandler(BaseHandler):
 class Devhandler(tornado.websocket.WebSocketHandler):
     def open(self):
         print("New device connection\n")
-    
+
     def on_message(self, message):
         serverMethods.processMsgFromClient(self, message)
 
