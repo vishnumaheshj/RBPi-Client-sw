@@ -2,6 +2,7 @@
 
 from __future__ import division
 import os.path
+import os
 import tornado.httpserver
 import tornado.websocket
 import tornado.ioloop
@@ -381,7 +382,7 @@ def main():
     )
     serverDB.initDatabase()
     http_server = tornado.httpserver.HTTPServer(app)
-    http_server.listen(8888)
+    http_server.listen(os.environ.get('PORT'))
     tornado.ioloop.IOLoop.instance().start()
 
 if __name__ == "__main__":

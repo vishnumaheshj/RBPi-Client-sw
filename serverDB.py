@@ -3,6 +3,7 @@ from datetime import datetime
 from switchboard import *
 from bidict import bidict
 import security
+import os
 
 hubCollection = None
 hubStates = None
@@ -19,12 +20,19 @@ def initDatabase():
     global hubUsers
     global validHubs
 
-    client = MongoClient()
+    client = MongoClient(os.environ.get('MONGOLAB_URI'),
+                          connectTimeoutMS=30000,
+                          socketTimeoutMS=None,
+                          socketKeepAlive=True)
+
     db = client.dotslash
     hubCollection = db.hubs
     hubStates = db.hubStates
     hubUsers = db.hubUsers
     validHubs = db.validHubs
+    #hubCollection.drop()
+    #hubStates.drop()
+    #hubUsers.drop()
 
     print("Database init success")
     print ("hubCollection entries:%d" % hubCollection.count())
