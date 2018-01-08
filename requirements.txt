@@ -1,0 +1,8 @@
+tornado==4.5.1
+pymongo
+bidict
+argon2_cffi
+passlib
+passlib[argon2]
+sockjs-tornado
+
