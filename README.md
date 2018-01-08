@@ -29,4 +29,6 @@ II) Running the program
 		
 		This will try to connect to server running at localhost port 8888 by default.
 		Update the details if remote connection etc.
+	3)cron_file_example
+		Contains a sample file used for automatic running of client program on RB PI boot
 
