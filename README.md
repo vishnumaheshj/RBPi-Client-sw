@@ -31,4 +31,6 @@ II) Running the program
 		Update the details if remote connection etc.
 	3)cron_file_example
 		Contains a sample file used for automatic running of client program on RB PI boot
+		$sudo crontab -e  
+		To access/edit the file. Use the above command
 

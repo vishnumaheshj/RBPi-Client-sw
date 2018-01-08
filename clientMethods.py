@@ -6,7 +6,7 @@ readId  =  int()
 writeId = int()
 listenThreadEvent = 0
 
-lib = ctypes.cdll.LoadLibrary("./libshm.so")
+lib = ctypes.cdll.LoadLibrary("/home/pi/dotslash/client/libshm.so")
 
 def writeShm(message):
     lib.write_shm(byref(message), writeId)

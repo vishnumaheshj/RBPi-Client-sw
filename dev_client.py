@@ -20,7 +20,7 @@ dev_ready_ntf = {}
 #Method to run ZNP init binary
 def execute_binary():
     global binary_init_status
-    binary = subprocess.Popen("./dataSendRcv.bin", stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    binary = subprocess.Popen("/home/pi/dotslash/client/dataSendRcv.bin", stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     while binary.poll() is None:
         line =  binary.stdout.readline()
         print("dataSendRcv.bin : %s" %line)
