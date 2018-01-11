@@ -1,6 +1,7 @@
 import switchboard
 from switchboard import *
 import ctypes
+import subprocess
 
 readId  =  int()
 writeId = int()
@@ -84,6 +85,9 @@ def createMessageForServer(Msg):
         print("Device Up notification")
         SerReq = {'message_type': SB_DEVICE_READY_NTF}
         SerReq['hubAddr'] = 0x0102030405060708
+        ip_addr = subprocess.check_output("ip addr| grep 'state UP' -A2| tail -n1| awk '{print $2}' | cut -f1 -d '/'", shell = True)
+        ip_addr = ip_addr[:-1]
+        SerReq['ip_addr'] = ip_addr
         return SerReq
     elif Msg.hdr.type == SB_DEVICE_INFO_NTF:
         print("Device Info notification")
