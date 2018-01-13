@@ -2,6 +2,7 @@ import switchboard
 from switchboard import *
 import ctypes
 import subprocess
+import logging
 
 readId  =  int()
 writeId = int()
@@ -17,14 +18,14 @@ def readShm(message):
 
 def createMessageForHub(Msg):
     if Msg['message_type'] == SB_BOARD_INFO_REQ:
-        print ("Info Req")
+        logging.info ("Info Req")
         HubReq = sbMessage_t()
         HubReq.hdr.type = SB_BOARD_INFO_REQ
         HubReq.hdr.nodeid = int(Msg['node'])
         HubReq.data.infoReqData.flags = 0
         return HubReq
     elif Msg['message_type'] == SB_STATE_CHANGE_REQ:
-        print ("State Change Req")
+        logging.info ("State Change Req")
         HubReq = sbMessage_t()
         HubReq.hdr.type = SB_STATE_CHANGE_REQ
         HubReq.hdr.nodeid = int(Msg['node'])
@@ -53,7 +54,7 @@ def createMessageForHub(Msg):
 
 def createMessageForServer(Msg):
     if Msg.hdr.type == SB_BOARD_INFO_RSP:
-        print("Info Rsp")
+        logging.info("Info Rsp")
         SerReq = {'message_type': SB_BOARD_INFO_RSP}
         SerReq['devIndex'] = Msg.hdr.nodeid
         SerReq['mid'] = Msg.hdr.mid
@@ -68,7 +69,7 @@ def createMessageForServer(Msg):
         SerReq['switch8'] = Msg.data.infoRspData.currentState.switch8
         return SerReq
     elif Msg.hdr.type == SB_STATE_CHANGE_RSP:
-        print ("State Change Rsp")
+        logging.info ("State Change Rsp")
         SerReq = {'message_type': SB_STATE_CHANGE_RSP}
         SerReq['devIndex'] = Msg.hdr.nodeid
         SerReq['sbType']  = Msg.data.infoRspData.sbType.type
@@ -82,7 +83,7 @@ def createMessageForServer(Msg):
         SerReq['switch8'] = Msg.data.boardData.switchData.state.switch8
         return SerReq
     elif Msg.hdr.type == SB_DEVICE_READY_NTF:
-        print("Device Up notification")
+        logging.info("Device Up notification")
         SerReq = {'message_type': SB_DEVICE_READY_NTF}
         SerReq['hubAddr'] = 0x0102030405060708
         ip_addr = subprocess.check_output("ifconfig wlan0 | grep 'inet addr' | awk '{print $2}' | cut -f2 -d ':'", shell = True)
@@ -90,8 +91,8 @@ def createMessageForServer(Msg):
         SerReq['ip_addr'] = ip_addr
         return SerReq
     elif Msg.hdr.type == SB_DEVICE_INFO_NTF:
-        print("Device Info notification")
-        print("PYTHON:::size of msg:%i" % sizeof(sbMessage_t))
+        logging.info("Device Info notification")
+        logging.info("PYTHON:::size of msg:%i" % sizeof(sbMessage_t))
         SerReq = {'message_type': SB_DEVICE_INFO_NTF}
         SerReq['joinState'] = Msg.data.devInfo.joinState
         SerReq['sbType']    = Msg.data.devInfo.sbType.type
@@ -108,7 +109,7 @@ def createMessageForServer(Msg):
         SerReq['switch8']   = Msg.data.devInfo.currentState.switch8
         return SerReq
     else:
-        print("Unknown message")
+        logging.error("Unknown message")
         return {}
 
 

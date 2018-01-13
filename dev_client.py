@@ -9,6 +9,7 @@ from threading import Thread
 from time import sleep
 import switchboard
 from switchboard import *
+import logging
 
 #globals
 client = None
@@ -16,6 +17,8 @@ client = None
 binary_init_status = 0
 dev_ready_ntf = {}
 
+def init_log(log_level):
+    logging.basicConfig(filename = 'client.log', format = "%(asctime)s:%(levelname)s: %(message)s", level = log_level)
 
 #Method to run ZNP init binary
 def execute_binary():
@@ -23,10 +26,10 @@ def execute_binary():
     binary = subprocess.Popen("/home/pi/dotslash/client/dataSendRcv.bin", stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     while binary.poll() is None:
         line =  binary.stdout.readline()
-        print("dataSendRcv.bin : %s" %line)
+        logging.info("dataSendRcv.bin : %s" %line)
         if line != '':
             if b'Error' in line:
-                print(line)
+                logging.error(line)
                 binary_init_status = -1
                 binary.terminate()
                 break
@@ -35,20 +38,20 @@ def execute_binary():
 
 
 def listen_hub():
-    print("@@..listening hub..@@")
+    logging.info("@@..listening hub..@@")
     global dev_ready_ntf
     global client
     inMsg = clientMethods.sbMessage_t()
     dev_ready_ntf = clientMethods.initializeHub()
     while True:
         clientMethods.readShm(inMsg)
-        print("listenHub:new message")
+        logging.info("listenHub:new message")
         serReq = clientMethods.createMessageForServer(inMsg)
         while client is None:
             sleep(1)
             continue
         client.write_message(json.dumps(serReq))
-        print("listenHub:send message")
+        logging.info("listenHub:send message")
         continue 
 
 
@@ -62,12 +65,12 @@ def connect_server():
             #client = yield tornado.websocket.websocket_connect("ws://192.168.0.106:8888/dev")
             client = yield tornado.websocket.websocket_connect("ws://dotslash.co/dev")
         except:
-            print("Connection Refused try again in 5")
+            logging.error("Connection Refused try again in 5")
             sleep(5)
         else:
                 global dev_ready_ntf
                 client.write_message(json.dumps(dev_ready_ntf))
-                print("Connection established")
+                logging.info("Connection established")
 
 
 @gen.coroutine
@@ -77,15 +80,15 @@ def dev_connect():
     thread = Thread(target = execute_binary)
     thread.daemon = True
     thread.start()
-    print("Initializing ZNP")
+    logging.info("Initializing ZNP")
     global binary_init_status
     while binary_init_status== 0:
         continue
     if binary_init_status== -1:
-        print("Could not initialize ZNP device")
+        logging.error("Could not initialize ZNP device")
         return
     else:
-        print("ZNP init success, connecting to server")
+        logging.info("ZNP init success, connecting to server")
 
     thread = Thread(target = listen_hub)
     thread.daemon = True
@@ -97,18 +100,19 @@ def dev_connect():
             sleep(1)
             continue
     yield connect_server()
-    print("$$....dev connect....$$")
+    logging.info("$$....dev connect....$$")
     while 1:
         msg = yield client.read_message()
-        print("From dev connect:%s" % msg)
+        logging.info("From dev connect:%s" % msg)
         if msg:
             Msg = json.loads(msg)
             Req = clientMethods.createMessageForHub(Msg)
             clientMethods.writeShm(Req)
-            print("From dev connect: send to hub")
+            logging.info("From dev connect: send to hub")
         else:
             yield connect_server()
     client.close()
 
 if __name__ == "__main__":
+    init_log(logging.DEBUG)
     tornado.ioloop.IOLoop.instance().run_sync(dev_connect)
