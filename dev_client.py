@@ -18,7 +18,7 @@ binary_init_status = 0
 dev_ready_ntf = {}
 
 def init_log(log_level):
-    logging.basicConfig(filename = 'client.log', format = "%(asctime)s:%(levelname)s: %(message)s", level = log_level)
+    logging.basicConfig(filename = '/home/pi/dotslash/client/client.log', format = "%(asctime)s:%(levelname)s: %(message)s", level = log_level)
 
 #Method to run ZNP init binary
 def execute_binary():
