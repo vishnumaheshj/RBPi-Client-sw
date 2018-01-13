@@ -86,8 +86,9 @@ def createMessageForServer(Msg):
         logging.info("Device Up notification")
         SerReq = {'message_type': SB_DEVICE_READY_NTF}
         SerReq['hubAddr'] = 0x0102030405060708
-        ip_addr = subprocess.check_output("ifconfig wlan0 | grep 'inet addr' | awk '{print $2}' | cut -f2 -d ':'", shell = True)
+        ip_addr = subprocess.check_output("/sbin/ifconfig wlan0 | /bin/grep 'inet addr' | /usr/bin/awk '{print $2}' | /usr/bin/cut -f2 -d ':'", shell = True)
         ip_addr = ip_addr[:-1]
+        logging.info("Local IP : %s", ip_addr)
         SerReq['ip_addr'] = ip_addr
         return SerReq
     elif Msg.hdr.type == SB_DEVICE_INFO_NTF:

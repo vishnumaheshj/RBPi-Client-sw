@@ -20,5 +20,9 @@
 # For more information see the manual pages of crontab(5) and cron(8)
 #
 # m h  dom mon dow   command
-@reboot rm -f /home/pi/dotslash/client/JoinedDevices
-@reboot python /home/pi/dotslash/client/dev_client.py > /home/pi/dotslash/logs 2>&1
+@reboot /bin/sh /home/pi/dotslash/client/start_script.sh
+#@reboot rm -f /home/pi/dotslash/client/client.log
+#@reboot rm -f /home/pi/dotslash/client/std.log
+#@reboot rm -f /home/pi/dotslash/client/JoinedDevices
+#@reboot /usr/bin/python /home/pi/dotslash/client/dev_client.py &>> /home/pi/dotslash/client/std.log
+#@reboot rm -f /home/pi/dotslash/client/logs
