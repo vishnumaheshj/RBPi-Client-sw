@@ -1,0 +1,9 @@
+[Unit]
+Description=Create a hotspot when booted.
+After=multi-user.target
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/bin/DotslashHotspot
+[Install]
+WantedBy=multi-user.target
