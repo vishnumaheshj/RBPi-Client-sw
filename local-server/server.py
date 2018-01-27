@@ -8,6 +8,8 @@ import tornado.web
 from tornado import gen
 import subprocess
 
+http_server = None
+
 class Mainhandler(tornado.web.RequestHandler):
     def get(self): 
         self.redirect("/signup")
@@ -24,6 +26,12 @@ class WifiHandler(tornado.web.RequestHandler):
         print(ssid)
         print(password)
         self.render("wifi.html", result = "success", ssid = ssid)
+        text = "network={\n\tssid=\"" + ssid + "\"\n\tscan_ssid=1\n\tkey_mgmt=WPA-PSK\n\tpsk=\"" + password + "\"\n}"
+        wpa_file = open("/etc/dot_wpa.conf", "w")
+        wpa_file.write(text)
+        wpa_file.close()
+        http_server.stop()
+        tornado.ioloop.IOLoop.instance().stop()
 
 class SignupHandler(tornado.web.RequestHandler):
     def get(self):
@@ -54,6 +62,7 @@ def main():
         template_path = os.path.join(os.path.dirname(__file__), "templates"),
         static_path = os.path.join(os.path.dirname(__file__), "static"),
     )
+    global http_server
     http_server = tornado.httpserver.HTTPServer(app)
     http_server.listen(80)
     tornado.ioloop.IOLoop.instance().start()
