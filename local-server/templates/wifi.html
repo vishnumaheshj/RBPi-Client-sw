@@ -31,22 +31,29 @@
     </nav>
 
     <div class="container">
-
       <div class="starter-template">
+	{% if 'result' in globals() and result == "success" %}
+	<h1> Thanks! We will try to connect to {{ ssid }} </h1>
+        {% else %}
         <h1>Choose your Wi-Fi</h1>
-	  <div class = "table">
-	    <table class = "table table-hover">
-	    {% if ssids %}
-	    {% for name in ssids %}
-	      <tr>
-                <td>
-		  <span class = "label label-info"> {{ name }} </span>
-                </td>
-	      </tr>
-	    {% end %}
-	    {% end %}
-	    </table>
-	  </div>
+        <form action = "/wifi" method = "POST" class = "form-signin">
+        <div class = "table">
+          <table class = "table table-hover">
+          {% if ssids %}
+          {% for name in ssids %}
+            <tr>
+                  <td align = "left">
+                  <span class = "label label-success"> <input type = "radio" name = "wifi" value="{{ name }}" required> {{ name }} </input></span>
+                  </td>
+            </tr>
+          {% end %}
+          {% end %}
+          </table>
+        </div>
+        <input type="password" name="password" id="wifiPassword" class="form-control" placeholder="Wi-Fi Password" required/>
+        <button class="btn btn-lg btn-primary btn-block" type="submit">Submit</button>
+        </form>
+	{% end %}
       </div>
     </div>
   </body>

@@ -18,9 +18,16 @@ class WifiHandler(tornado.web.RequestHandler):
         wifi_list = list(filter(None, out.split('\n')))
         self.render("wifi.html", ssids=wifi_list)
 
+    def post(self):
+        ssid = tornado.escape.xhtml_escape(self.get_argument("wifi"))
+        password = tornado.escape.xhtml_escape(self.get_argument("password"))
+        print(ssid)
+        print(password)
+        self.render("wifi.html", result = "success", ssid = ssid)
+
 class SignupHandler(tornado.web.RequestHandler):
     def get(self):
-        self.render("login.html", logintype="signup")
+        self.render("login.html")
 
     def post(self):
         hubid = tornado.escape.xhtml_escape(self.get_argument("hubid"))
@@ -35,7 +42,7 @@ class SignupHandler(tornado.web.RequestHandler):
         if hash_cur == hash_ori:
             self.redirect("/wifi")
         else:
-            self.render("login.html", logintype="signup", errorString = "Invalid Hub Address")
+            self.render("login.html", errorString = "Invalid Hub Address")
 
 def main():
     app = tornado.web.Application(
