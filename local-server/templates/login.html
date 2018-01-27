@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>Dotslash INC</title>
+        <link rel="stylesheet" href="{{ static_url("dist/css/bootstrap.min.css") }}" type="text/css">
+	<link rel="stylesheet" href="{{ static_url("login.css") }}" type="text/css">
+    </head>
+    <body>
+        <div class="container">
+            <form action="/signup" method="POST" class="form-signin">
+                {% if 'errorString' in globals() %}
+                <div class="alert alert-danger">{{ errorString }}</div>
+                {% end %}
+                {% module xsrf_form_html() %}
+            	<h3 class="form-signin-heading">Welcome to Dotslash</h5>
+                <h5 class="form-signin-heading">Please enter Hub Identification Number</h4>
+                <input type="text" name="hubid" id="inputHubid" class="form-control" placeholder="Hub ID Number" required autofocus/>
+                <button class="btn btn-lg btn-primary btn-block" type="submit">Authenticate</button>
+            </form>
+        </div>
+    </body>
+</html>

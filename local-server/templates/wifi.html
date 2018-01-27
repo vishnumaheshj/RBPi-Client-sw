@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Wi-Fi Manager</title>
+
+    <link rel="stylesheet" href="{{ static_url("dist/css/bootstrap.min.css") }}" type="text/css">
+    <link rel="stylesheet" href="{{ static_url("wifi.css") }}" type="text/css">
+
+  </head>
+
+  <body>
+
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">Dotslash Hub</a>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container">
+
+      <div class="starter-template">
+        <h1>Choose your Wi-Fi</h1>
+	  <div class = "table">
+	    <table class = "table table-hover">
+	    {% if ssids %}
+	    {% for name in ssids %}
+	      <tr>
+                <td>
+		  <span class = "label label-info"> {{ name }} </span>
+                </td>
+	      </tr>
+	    {% end %}
+	    {% end %}
+	    </table>
+	  </div>
+      </div>
+    </div>
+  </body>
+</html>
