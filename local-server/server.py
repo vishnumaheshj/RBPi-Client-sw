@@ -16,7 +16,7 @@ class Mainhandler(tornado.web.RequestHandler):
 
 class WifiHandler(tornado.web.RequestHandler):
     def get(self):
-        out = subprocess.check_output("sudo iw dev 'wlan0' scan ap-force | egrep 'SSID:' | cut -d ':' -f2", shell = True)
+        out = subprocess.check_output("sudo iw dev 'wlan0' scan ap-force | grep 'SSID:' | cut -d ':' -f2", shell = True)
         wifi_list = list(filter(None, out.split('\n')))
         self.render("wifi.html", ssids=wifi_list)
 
@@ -26,10 +26,18 @@ class WifiHandler(tornado.web.RequestHandler):
         print(ssid)
         print(password)
         self.render("wifi.html", result = "success", ssid = ssid)
-        text = "network={\n\tssid=\"" + ssid + "\"\n\tscan_ssid=1\n\tkey_mgmt=WPA-PSK\n\tpsk=\"" + password + "\"\n}"
+
+        out = subprocess.check_output("sudo iwlist wlan0 scan", shell=True)
+        for group in out.split("Cell"):
+            if ssid in group:
+                if "WPA" in group:
+                    text = "network={\n\tssid=\"" + ssid + "\"\n\tscan_ssid=1\n\tkey_mgmt=WPA-PSK\n\tpsk=\"" + password + "\"\n}"
+                else:
+                    text = "network={\n\tssid=\"" + ssid + "\"\n\tkey_mgmt=NONE\n\twep_key0=\"" + password + "\"\n\twep_tx_keyidx=0\n}"
         wpa_file = open("/etc/dot_wpa.conf", "w")
         wpa_file.write(text)
         wpa_file.close()
+
         http_server.stop()
         tornado.ioloop.IOLoop.instance().stop()
 
