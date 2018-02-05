@@ -1,5 +1,7 @@
 #!/bin/bash
 
+current_ssid_status=0
+ip_status=0
 makeHotspot()
 {
 	ifconfig wlan0 down
@@ -7,8 +9,10 @@ makeHotspot()
 	systemctl start dnsmasq
 	systemctl start hostapd
 }
+
 shutdownHotspot()
 {
+	killall -9 wpa_supplicant
 	ifconfig wlan0 down
 	systemctl stop hostapd.service
 	systemctl stop dnsmasq.service
@@ -16,10 +20,69 @@ shutdownHotspot()
 	ifconfig wlan0 up
 }
 
-makeHotspot
-python /home/pi/dotslash/client/local-server/server.py
-shutdownHotspot
-wpa_supplicant -B -i wlan0 -c /etc/dot_wpa.conf
-sleep 20
-python /home/pi/dotslash/client/dev_client.py
+check_current_ssid()
+{
+	saved_ssid=$(grep 'ssid="' /etc/dot_wpa.conf | cut -d '=' -f2 | cut -d '"' -f2) > /dev/null
+	sleep 10
+	ssid_scan=$(sudo iwlist wlan0 scan | grep ESSID) > /dev/null
+	echo $ssid_scan
+	echo $saved_ssid
+	if (echo $ssid_scan | grep $saved_ssid) > /dev/null
+	then
+		current_ssid_status=1
+	else
+		current_ssid_status=0
+	fi
+}
 
+check_ip()
+{
+	ip=$(ifconfig wlan0 | grep 'inet addr' | awk '{print $2}' | cut -d ":" -f2)
+	if [[ $ip ]]
+	then
+		ip_status=1
+	else
+		ip_status=0
+	fi
+}
+
+server_loop()
+{
+	shutdownHotspot
+	makeHotspot
+	python /home/pi/dotslash/client/local-server/server.py
+	shutdownHotspot
+}
+
+run_wpa_wait()
+{
+	wpa_supplicant -B -i wlan0 -c /etc/dot_wpa.conf
+	sleep 10
+}
+
+hotspot_loop()
+{
+	until [ "$ip_status" -eq "1" ]
+	do
+		server_loop
+		run_wpa_wait
+		check_ip
+	done
+	python /home/pi/dotslash/client/dev_client.py
+}
+
+check_current_ssid
+if [ "$current_ssid_status" -eq "1" ]
+then
+	shutdownHotspot
+	run_wpa_wait
+	check_ip
+	if [ "$ip_status" -eq "1" ]
+	then
+		python /home/pi/dotslash/client/dev_client.py
+	else
+		hotspot_loop
+	fi
+else
+	hotspot_loop
+fi
