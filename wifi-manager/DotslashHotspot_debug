@@ -1,0 +1,25 @@
+#!/bin/bash
+
+makeHotspot()
+{
+	ifconfig wlan0 down
+	ifconfig wlan0 10.0.0.10/24 up
+	systemctl start dnsmasq
+	systemctl start hostapd
+}
+shutdownHotspot()
+{
+	ifconfig wlan0 down
+	systemctl stop hostapd.service
+	systemctl stop dnsmasq.service
+	ip addr flush dev wlan0
+	ifconfig wlan0 up
+}
+
+makeHotspot
+python /home/pi/dotslash/client/local-server/server.py
+shutdownHotspot
+wpa_supplicant -B -i wlan0 -c /etc/dot_wpa.conf
+sleep 20
+python /home/pi/dotslash/client/dev_client.py
+
