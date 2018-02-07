@@ -50,13 +50,13 @@ server_loop()
 {
 	shutdownHotspot
 	makeHotspot
-	python /home/pi/dotslash/client/local-server/server.py
+	python /home/pi/dotslash/client/config-server/server.py
 	shutdownHotspot
 }
 
 run_wpa_wait()
 {
-	wpa_supplicant -B -i wlan0 -c /etc/dot_wpa.conf
+	wpa_supplicant -B -i wlan0 -c /etc/dot_wpa.conf &
 	sleep 10
 }
 
@@ -68,7 +68,7 @@ hotspot_loop()
 		run_wpa_wait
 		check_ip
 	done
-	python /home/pi/dotslash/client/dev_client.py
+	python /home/pi/dotslash/client/dev_client.py &
 }
 
 check_current_ssid
@@ -79,7 +79,7 @@ then
 	check_ip
 	if [ "$ip_status" -eq "1" ]
 	then
-		python /home/pi/dotslash/client/dev_client.py
+		python /home/pi/dotslash/client/dev_client.py &
 	else
 		hotspot_loop
 	fi
