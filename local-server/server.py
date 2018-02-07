@@ -125,6 +125,17 @@ class Userhandler(tornado.web.RequestHandler):
                 if len(serverDB.appSocketList[self.current_user]) != 0:
                     AppSocketConnection.broadcast(serverDB.appSocketList[self.current_user][0], serverDB.appSocketList[self.current_user], msg)
 
+@gen.coroutine
+def connect_server():
+    client = None
+    while client is None:
+        try:
+            client = yield tornado.websocket.websocket_connect("ws://dotslash.co/dev")
+        except:
+            print("Connection Refused try again in 5")
+            sleep(5)
+        else:
+            print("Connected")
 
 def main():
     app = tornado.web.Application(
@@ -141,6 +152,7 @@ def main():
     serverDB.initDatabase()
     http_server = tornado.httpserver.HTTPServer(app)
     http_server.listen(8888)
+    tornado.ioloop.IOLoop.instance().run_sync(connect_server)
     tornado.ioloop.IOLoop.instance().start()
 
 if __name__ == "__main__":
