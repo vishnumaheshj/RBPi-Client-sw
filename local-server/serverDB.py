@@ -25,7 +25,6 @@ def initDatabase():
     hubCollection = db.hubs
     hubStates = db.hubStates
     hubUsers = db.hubUsers
-    validHubs = db.validHubs
     #hubCollection.drop()
     #hubStates.drop()
     #hubUsers.drop()
@@ -208,8 +207,8 @@ def findNode(hubAddr, nodeid):
             return None
 
 
-def findHub(hubAddr):
-    return hubStates.find_one({"hubAddr": hubAddr})
+def findHub():
+    return hubStates.find_one()
 
 
 def makeHubOffline(hubAddr):
@@ -358,8 +357,8 @@ def findUserHub(username):
     else:
         return 0
 
-def checkHubActive(hubAddr):
-    cursor = hubCollection.find_one({"hubAddr": hubAddr})
+def checkHubActive():
+    cursor = hubCollection.find_one()
     if cursor and "active" in cursor:
             if (cursor["active"] == HS_ONLINE):
                     return True

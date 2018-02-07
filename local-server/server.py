@@ -22,11 +22,9 @@ from random import random
 
 class Mainhandler(tornado.web.RequestHandler):
     def get(self): 
-        device = serverDB.findUserHub(self.current_user)
-        print("Device of user %s:%d" %(self.current_user, device))
+        device = 1
         nodeList = {}
-        if device:
-            nodeList = serverDB.findHub(device)
+        nodeList = serverDB.findHub()
 
         i = md5()
         i.update('%s%s' % (random(), time()))
@@ -35,7 +33,7 @@ class Mainhandler(tornado.web.RequestHandler):
             serverDB.sessionList[self.current_user] = []
         serverDB.sessionList[self.current_user].append(sessionId)
 
-        if serverDB.checkHubActive(device) is False:
+        if serverDB.checkHubActive() is False:
             device = 0
 
         self.render("index.html", nodes=nodeList, hubid=device, sessionId=sessionId)
