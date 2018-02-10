@@ -7,3 +7,5 @@ all:
 clean:
 	rm -f libshm.so server.o client ../libshm.so
 	rm -f ../*.pyc
+	rm -f ../local-server/*.pyc
+	rm -f ../config-server/*.pyc
