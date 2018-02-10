@@ -151,7 +151,7 @@ def main():
     )
     serverDB.initDatabase()
     http_server = tornado.httpserver.HTTPServer(app)
-    http_server.listen(8888)
+    http_server.listen(80)
     tornado.ioloop.IOLoop.instance().run_sync(connect_server)
     tornado.ioloop.IOLoop.instance().start()
 
