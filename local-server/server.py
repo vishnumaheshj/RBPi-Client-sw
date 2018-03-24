@@ -18,6 +18,7 @@ from time import time
 from hashlib import md5
 from random import random
 
+remote_server = None
 
 
 class Mainhandler(tornado.web.RequestHandler):
@@ -44,7 +45,8 @@ class Devhandler(tornado.websocket.WebSocketHandler):
         print("New device connection\n")
 
     def on_message(self, message):
-        serverMethods.processMsgFromClient(self, message)
+        global remote_server
+        serverMethods.processMsgFromClient(self, remote_server, message)
 
     def on_close(self):
             if self in serverDB.connectionList.inv:
@@ -127,10 +129,10 @@ class Userhandler(tornado.web.RequestHandler):
 
 @gen.coroutine
 def connect_server():
-    client = None
-    while client is None:
+    global remote_server
+    while remote_server is None:
         try:
-            client = yield tornado.websocket.websocket_connect("ws://dotslash.co/dev")
+            remote_server= yield tornado.websocket.websocket_connect("ws://dotslash.co/dev")
         except:
             print("Connection Refused try again in 5")
             sleep(5)

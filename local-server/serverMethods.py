@@ -32,8 +32,8 @@ def sentStateChangeReq(nodeid, sbtype, self):
         Msg['switch8'] = SW_DONT_CARE
     return Msg
 
-def processMsgFromClient(connection, clientMessage):
-    clientMessage = json.loads(clientMessage)
+def processMsgFromClient(connection, remote_server, Message):
+    clientMessage = json.loads(Message)
     if clientMessage['message_type'] == SB_BOARD_INFO_RSP:
         print ("Info Response received")
         serverDB.updateNode(connection, clientMessage)
@@ -48,3 +48,6 @@ def processMsgFromClient(connection, clientMessage):
     elif clientMessage['message_type'] == SB_DEVICE_INFO_NTF:
         print("hub addr:%s" % format(clientMessage['hubAddr'], '#010x'))
         serverDB.addHubStates(clientMessage, connection)
+
+    remote_server.write_message(Message)
+

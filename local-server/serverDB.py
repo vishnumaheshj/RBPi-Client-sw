@@ -19,9 +19,9 @@ def initDatabase():
     global hubUsers
     global validHubs
 
-    client = MongoClient()
+    dbClient = MongoClient()
 
-    db = client.dotslash
+    db = dbClient.dotslash
     hubCollection = db.hubs
     hubStates = db.hubStates
     hubUsers = db.hubUsers
