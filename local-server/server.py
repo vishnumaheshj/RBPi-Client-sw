@@ -23,41 +23,31 @@ remote_server = None
 
 class Mainhandler(tornado.web.RequestHandler):
     def get(self): 
-        device = 1
+        if serverDB.devClientConnection is None:
+            device = 0
+        else:
+            device = 1
         nodeList = {}
-        nodeList = serverDB.findHub()
+        nodeList = serverDB.getHubState()
 
         i = md5()
         i.update('%s%s' % (random(), time()))
         sessionId = i.hexdigest()
-        if self.current_user not in serverDB.sessionList:
-            serverDB.sessionList[self.current_user] = []
-        serverDB.sessionList[self.current_user].append(sessionId)
-
-        if serverDB.checkHubActive() is False:
-            device = 0
 
         self.render("index.html", nodes=nodeList, hubid=device, sessionId=sessionId)
 
 
 class Devhandler(tornado.websocket.WebSocketHandler):
     def open(self):
-        print("New device connection\n")
+        print("dev_client connection\n")
 
     def on_message(self, message):
         global remote_server
         serverMethods.processMsgFromClient(self, remote_server, message)
 
     def on_close(self):
-            if self in serverDB.connectionList.inv:
-                print("\nclosing connection for %d" % serverDB.connectionList.inv[self])
-                serverDB.makeHubOffline(serverDB.connectionList.inv[self])
-                del serverDB.connectionList.inv[self]
-                print("closed connection \n")
-                print("connection list")
-                print(serverDB.connectionList)
-            else:
-               print("\nunknown connection closed")
+        serverDB.devClientConnection = None
+        print("Closed dev_client connection\n")
 
     def on_ping(self, data):
         print("received ping")
@@ -76,68 +66,43 @@ class Userhandler(tornado.web.RequestHandler):
         if sid is not None:
             print("socket id of ajax request:%s" % sid)
 
-        if int(hubAddr) in serverDB.connectionList: 
-                conn = serverDB.connectionList[int(hubAddr)]
-                nodeList = serverDB.findHub(int(hubAddr))
-                boardStr = "board" + nodeid
+        conn = serverDB.devClientConnection
+        if conn is not None:
+            nodeList = serverDB.getHubState()
+            boardStr = "board" + nodeid
 
-                if boardStr in nodeList:
-                    node = nodeList[boardStr]
-                    Msg = serverMethods.sentStateChangeReq(node['devIndex'], node['type'], self)
-                    serverMethods.messageNum += 1       #
-                    serverMethods.messageList[serverMethods.messageNum] = 0
-                    
-                    print("sent state change")
-                    Msg.update({'mid': serverMethods.messageNum})
-                    print(Msg)
-                    conn.write_message(Msg)
-                    found = 1
-                else:
-                    found = 0
+            if boardStr in nodeList:
+                node = nodeList[boardStr]
+                Msg = serverMethods.prepareStateChangeReq(node['devIndex'], node['type'], self)
+                conn.write_message(Msg)
+                found = 1
+            else:
+                found = 0
+        else:
+            print("Dev_client connection not found\n")
+        '''
+        TODO : Sent this message properly to global server as well
+        '''
         if (found == 0):
             self.write("Device not found\n")
-        else:
-            # Async Wait for info response.
-            # Fetch and send result.
-            i = 0
-            while (i < 20 and serverMethods.messageList[serverMethods.messageNum] == 0):
-                yield gen.sleep(0.2)
-                i += 1
-            print("yield sleep sec(s),active list is")
-            print(serverMethods.messageList)
-            print(i/5)
-            del serverMethods.messageList[serverMethods.messageNum]
-            
-            nodeList = serverDB.findHub(int(hubAddr))
-            msg = json.dumps(nodeList, default=json_util.default)
-            self.write(msg)
-            # Update other clients...
-            nodeList['serverPush'] = 'stateChange'
-            nodeList['socketId'] = sid
-            nodeList['appSocketID'] = '0'
-            if '_id' in nodeList:
-                del nodeList['_id']
-            msg = json.dumps(nodeList, default=json_util.default)
-            if self.current_user in serverDB.socketList:
-                print("sending to browsers:%d" % len(serverDB.socketList[self.current_user]))
-                if len(serverDB.socketList[self.current_user]) != 0:
-                    SocketConnection.broadcast(serverDB.socketList[self.current_user][0], serverDB.socketList[self.current_user], msg)
-            if self.current_user in serverDB.appSocketList:
-                print("sending to apps:%d" % len(serverDB.appSocketList[self.current_user]))
-                if len(serverDB.appSocketList[self.current_user]) != 0:
-                    AppSocketConnection.broadcast(serverDB.appSocketList[self.current_user][0], serverDB.appSocketList[self.current_user], msg)
+        '''
+        TODO : DO the async update all user connection thing
+        '''
 
 @gen.coroutine
 def connect_server():
+    '''
+    TODO : Do the read message from global server and self identification, auth, ip etc
+    '''
     global remote_server
     while remote_server is None:
         try:
             remote_server= yield tornado.websocket.websocket_connect("ws://dotslash.co/dev")
         except:
             print("Connection Refused try again in 5")
-            sleep(5)
+            tornado.gen.sleep(5)
         else:
-            print("Connected")
+            print("Connected to global server")
 
 def main():
     app = tornado.web.Application(

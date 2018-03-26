@@ -6,14 +6,14 @@ messageList = {}
 messageNum = 0
 
 
-def sentBoardInfoReq(nodeid):
+def prepareBoardInfoReq(nodeid):
     Msg = {'message_type': SB_BOARD_INFO_REQ}
     Msg['node'] = nodeid
     Msg['flags'] = 0
     return Msg
 
 
-def sentStateChangeReq(nodeid, sbtype, self):
+def prepareStateChangeReq(nodeid, sbtype, self):
     Msg = {'message_type': SB_STATE_CHANGE_REQ}
     Msg['node'] = nodeid
     if(sbtype == SB_TYPE_4X4):
@@ -44,10 +44,13 @@ def processMsgFromClient(connection, remote_server, Message):
     elif clientMessage['message_type'] == SB_DEVICE_READY_NTF:
         print ("Hub is up and running")
         print("Message received %s\n" %clientMessage)
-        serverDB.addHub(connection, clientMessage)
+        serverDB.devClientConnection = connection
+        '''
+        TODO : Device ready should be sent from local-server itself with ip, probably
+        '''
     elif clientMessage['message_type'] == SB_DEVICE_INFO_NTF:
         print("hub addr:%s" % format(clientMessage['hubAddr'], '#010x'))
         serverDB.addHubStates(clientMessage, connection)
-
-    remote_server.write_message(Message)
+    if remote_server is not None:
+        remote_server.write_message(Message)
 

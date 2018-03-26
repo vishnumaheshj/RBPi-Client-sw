@@ -4,13 +4,9 @@ from switchboard import *
 from bidict import bidict
 import os
 
-hubCollection = None
 hubStates = None
 hubUsers = None
-connectionList = bidict()
-socketList = dict()
-appSocketList = dict()
-sessionList = dict()
+devClientConnection = None
 
 
 def initDatabase():
@@ -31,20 +27,14 @@ def initDatabase():
     print ("hubUsers entries:%d" % hubUsers.count())
 
 
-def addHubStates(clientMessage, connection):
-    
+def addHubStates(clientMessage):
     global hubStates
-    global connectionList
-
-    print("Hub Info message")    
-    hubAddr = connectionList.inv[connection]
-    cursor = hubStates.find_one({"hubAddr": hubAddr})
+    cursor = hubStates.find_one()
     boardStr = "board"+str(clientMessage['devIndex'])
     if cursor is None:
-        print ("cursor none, adding Hub State")
+        print ("Adding Hub State")
         hubStates.insert_one(
         {
-            "hubAddr"     : hubAddr,
             "totalNodes"  : 1,
             boardStr      : {
                                 "devIndex"     : clientMessage['devIndex'],
@@ -62,12 +52,11 @@ def addHubStates(clientMessage, connection):
                             }
         })
     else:
-        print("state present, updating Hub State")
-        boardStr = "board"+str(clientMessage['devIndex'])
-        nodeCursor =  hubStates.find_one({"hubAddr": hubAddr, boardStr+".devIndex": clientMessage['devIndex']})
+        print("Updating Hub State")
+        nodeCursor =  hubStates.find_one({boardStr+".devIndex": clientMessage['devIndex']})
         if nodeCursor is None:
             print("New Node Joined")
-            hubStates.update_one({"hubAddr": cursor['hubAddr']},
+            hubStates.update_one({},
                 {"$set": {
                             "totalNodes" : cursor['totalNodes'] + 1,
                             boardStr     : {
@@ -88,7 +77,7 @@ def addHubStates(clientMessage, connection):
                 }
             )
         else:
-            hubStates.update_one({"hubAddr": cursor['hubAddr'],boardStr+".devIndex": clientMessage['devIndex']},
+            hubStates.update_one({boardStr+".devIndex": clientMessage['devIndex']},
                 {"$set": {
                             boardStr     : {
                                             "devIndex"     : clientMessage['devIndex'],
@@ -108,24 +97,15 @@ def addHubStates(clientMessage, connection):
                 }
             )
 
-    document = hubStates.find_one({"hubAddr": clientMessage['hubAddr']})
-    if document is not None:
-        print("document")
-        print(document)
-
-
-def updateNode(connection, clientMessage):
+def updateNode(clientMessage):
     global hubStates
-    global connectionList
-
-    hubAddr = connectionList.inv[connection]
     boardStr = "board"+str(clientMessage['devIndex'])
-    nodeCursor =  hubStates.find_one({"hubAddr": hubAddr, boardStr+".devIndex": clientMessage['devIndex']})
+    nodeCursor =  hubStates.find_one({boardStr+".devIndex": clientMessage['devIndex']})
 
     if nodeCursor is None:
         print("The node to be updated is not present")
     else:
-        hubStates.update_one({"hubAddr": nodeCursor['hubAddr']},
+        hubStates.update_one({},
             {"$set": {
                         boardStr+".lastModified" : datetime.now(),
                         boardStr+".switch1" : clientMessage['switch1'],
@@ -140,14 +120,17 @@ def updateNode(connection, clientMessage):
             })
 
 
-def findNode(hubAddr, nodeid):
+def findNode(nodeid):
     boardStr = "board"+str(nodeid)
-    row = hubStates.find_one({"hubAddr": hubAddr, boardStr+".devIndex": nodeid})
+    row = hubStates.find_one({boardStr+".devIndex": nodeid})
     if row is not None:
             node = row[boardStr]
             return node
     else:
             return None
+
+def getHubState():
+    hubStates.find_one()
 
 
 def addUser(username, password):
