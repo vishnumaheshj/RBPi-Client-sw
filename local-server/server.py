@@ -17,6 +17,7 @@ import json
 from time import time
 from hashlib import md5
 from random import random
+from time import sleep
 
 remote_server = None
 
@@ -100,9 +101,26 @@ def connect_server():
             remote_server= yield tornado.websocket.websocket_connect("ws://dotslash.co/dev")
         except:
             print("Connection Refused try again in 5")
-            tornado.gen.sleep(5)
+            sleep(5)
         else:
             print("Connected to global server")
+
+@gen.coroutine
+def global_server_read():
+    global remote_server
+    yield connect_server()
+
+    while 1:
+        msg = yield remote_server.read_message()
+        if msg:
+            if  serverDB.devClientConnection is not None:
+                serverDB.devClientConnection.write_message(msg)
+                print("Message from global server")
+                print(msg)
+        else:
+            yield connect_server()
+
+    remote_server.close()
 
 def main():
     app = tornado.web.Application(
@@ -119,7 +137,7 @@ def main():
     serverDB.initDatabase()
     http_server = tornado.httpserver.HTTPServer(app)
     http_server.listen(80)
-    tornado.ioloop.IOLoop.instance().run_sync(connect_server)
+    tornado.ioloop.IOLoop.instance().run_sync(global_server_read)
     tornado.ioloop.IOLoop.instance().start()
 
 if __name__ == "__main__":

@@ -37,7 +37,6 @@ def processMsgFromClient(connection, remote_server, Message):
     if clientMessage['message_type'] == SB_BOARD_INFO_RSP:
         print ("Info Response received")
         serverDB.updateNode(connection, clientMessage)
-        informWebClient(clientMessage)
     elif clientMessage['message_type'] == SB_STATE_CHANGE_RSP:
         print ("State change Response received")
         connection.write_message(msg)
@@ -51,6 +50,7 @@ def processMsgFromClient(connection, remote_server, Message):
     elif clientMessage['message_type'] == SB_DEVICE_INFO_NTF:
         print("hub addr:%s" % format(clientMessage['hubAddr'], '#010x'))
         serverDB.addHubStates(clientMessage, connection)
+
     if remote_server is not None:
         remote_server.write_message(Message)
 
