@@ -14,78 +14,21 @@ sessionList = dict()
 
 
 def initDatabase():
-    global hubCollection
     global hubStates
     global hubUsers
-    global validHubs
 
     dbClient = MongoClient()
 
     db = dbClient.dotslash
-    hubCollection = db.hubs
     hubStates = db.hubStates
     hubUsers = db.hubUsers
-    #hubCollection.drop()
+
     #hubStates.drop()
     #hubUsers.drop()
 
     print("Database init success")
-    print ("hubCollection entries:%d" % hubCollection.count())
     print ("hubStates entries:%d" % hubStates.count())
     print ("hubUsers entries:%d" % hubUsers.count())
-
-
-def addHub(connection, clientMessage):
-    global hubCollection
-    global connectionList
-
-    if clientMessage['message_type'] != SB_DEVICE_READY_NTF:
-        return 1
-
-    connectionList[clientMessage['hubAddr']] = connection
-    
-    cursor = hubCollection.find_one({"hubAddr": clientMessage['hubAddr']})
-    if cursor is None:
-        print ("cursor none, adding Hub")
-        hubCollection.insert_one(
-            {
-                "hubAddr"      : clientMessage['hubAddr'],
-                "joinTime"     : datetime.now(),
-                "active"       : HS_ONLINE,
-                "offlineSince" : 0,
-                "user"         : None,
-            }
-        )
-        print ("Hub Activated.User not registered yet")
-
-    else:
-        hubCursor = hubCollection.find_one({"hubAddr": clientMessage['hubAddr'], "$or": [{"active": HS_ONLINE}, {"active": HS_OFFLINE}]})
-        if hubCursor is None:
-            print("Hub is already registered by user.Activating...") 
-            hubCollection.update_one({"hubAddr": clientMessage['hubAddr']},
-                                     {"$set":   {
-                                                   "joinTime"     : datetime.now(),
-                                                   "active"       : HS_ONLINE,
-                                                   "offlineSince" : 0,
-                                                }
-                                     })
-        else:
-            hubCollection.update_one({"hubAddr": clientMessage['hubAddr']},
-                                     {"$set":   {
-                                                    "joinTime"     : datetime.now(),
-                                                    "active"       : HS_ONLINE,
-                                                    "offlineSince" : 0,
-                                                }
-                                     })
-            print("Hub is now marked as active")
-    
-    cursor = hubCollection.find({"hubAddr": clientMessage['hubAddr']})
-    for document in cursor:
-        print (document)
-    print("###############################################################")
-    print("connection list")
-    print(connectionList)
-    print("###############################################################")
 
 
 def addHubStates(clientMessage, connection):
@@ -207,25 +150,6 @@ def findNode(hubAddr, nodeid):
             return None
 
 
-def findHub():
-    return hubStates.find_one()
-
-
-def makeHubOffline(hubAddr):
-        hubCollection.update_one({"hubAddr": hubAddr},
-            {"$set": {
-                "active"       : HS_OFFLINE,
-                "offlineSince" : datetime.now(),
-                    }
-            })
-
-        document = hubCollection.find_one({"hubAddr": hubAddr})
-        if document is not None:
-            print("document")
-            print(document)
-            print("'''''''''''''''")
-
-
 def addUser(username, password):
     cursor = hubUsers.find_one({"username": username})
     if cursor is None:
@@ -299,70 +223,3 @@ def logoutUser(username):
         print(userDB)
 
     return status
-
-def checkHubValid(hubId):
-    global validHubs
-    cursor = validHubs.find_one({"hubAddr": hubId})
-    if cursor is None:
-            status = "Hub ID is not valid"
-    else:
-            status = None
-    return status
-
-
-def registerHub(username, hubId):
-    cursor = hubUsers.find_one({"username": username})
-    if cursor is not None:
-        hubCursor = hubCollection.find_one({"hubAddr": hubId})
-        if hubCursor is not None:
-            hubCollection.update_one({"hubAddr": hubId},
-                                     {"$set":   {
-                                                    "user": username,
-                                                }
-                                     })
-            status = None
-        else:
-            print("User Added.Hub hasn't joined")
-            hubCollection.insert_one(
-                {
-                "hubAddr"      : hubId,
-                "joinTime"     : None,
-                "active"       : None,
-                "offlineSince" : None,
-                "user"         : username,
-                }
-            )
- 
-            status = None
-    else:
-        print("Signup failed.Hub not registered")
-        status = "Signup failed.Hub not registered"
-
-    hubsDB = hubCollection.find_one({})
-    if hubsDB is not None:
-        print("hub database")
-        print(hubsDB)
-
-    return status
-
-
-def findUserHub(username):
-    cursor = hubUsers.find_one({"username": username})
-    if cursor is not None:
-        hubCursor = hubCollection.find_one({"user": username})
-        if hubCursor is not None:                               # Assuming a single document for now.
-            return hubCursor["hubAddr"]
-        else:
-            return 0
-    else:
-        return 0
-
-def checkHubActive():
-    cursor = hubCollection.find_one()
-    if cursor and "active" in cursor:
-            if (cursor["active"] == HS_ONLINE):
-                    return True
-            else:
-                    return False
-    else:
-            return False
