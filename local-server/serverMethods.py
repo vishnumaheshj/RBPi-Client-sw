@@ -30,6 +30,7 @@ def prepareStateChangeReq(nodeid, sbtype, self):
         Msg['switch6'] = SW_DONT_CARE
         Msg['switch7'] = SW_DONT_CARE
         Msg['switch8'] = SW_DONT_CARE
+        Msg['mid']     = 0 #For now no request completion lookup. 
     return Msg
 
 def processMsgFromClient(connection, remote_server, Message):
