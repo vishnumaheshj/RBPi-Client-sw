@@ -1,4 +1,3 @@
-from pymongo import MongoClient
 from datetime import datetime
 from switchboard import *
 from bidict import bidict
@@ -12,113 +11,47 @@ devClientConnection = None
 def initDatabase():
     global hubStates
     global hubUsers
-
-    dbClient = MongoClient()
-
-    db = dbClient.dotslash
-    hubStates = db.hubStates
-    hubUsers = db.hubUsers
-
-    #hubStates.drop()
-    #hubUsers.drop()
-
-    print("Database init success")
-    print ("hubStates entries:%d" % hubStates.count())
-    print ("hubUsers entries:%d" % hubUsers.count())
-
+    print(" init success")
 
 def addHubStates(clientMessage):
     global hubStates
-    cursor = hubStates.find_one()
+    hubStates = {}
+    hubStates['totalNodes'] = 1
     boardStr = "board"+str(clientMessage['devIndex'])
-    if cursor is None:
-        print ("Adding Hub State")
-        hubStates.insert_one(
-        {
-            "totalNodes"  : 1,
-            boardStr      : {
-                                "devIndex"     : clientMessage['devIndex'],
-                                "type"         : clientMessage['sbType'],
-                                "epStatus"     : clientMessage['epStatus'],
-                                "lastModified" : datetime.now(),
-                                "switch1"      : clientMessage['switch1'],
-                                "switch2"      : clientMessage['switch2'],
-                                "switch3"      : clientMessage['switch3'],
-                                "switch4"      : clientMessage['switch4'],
-                                "switch5"      : clientMessage['switch5'],
-                                "switch6"      : clientMessage['switch6'],
-                                "switch7"      : clientMessage['switch7'],
-                                "switch8"      : clientMessage['switch8'],
-                            }
-        })
-    else:
-        print("Updating Hub State")
-        nodeCursor =  hubStates.find_one({boardStr+".devIndex": clientMessage['devIndex']})
-        if nodeCursor is None:
-            print("New Node Joined")
-            hubStates.update_one({},
-                {"$set": {
-                            "totalNodes" : cursor['totalNodes'] + 1,
-                            boardStr     : {
-                                            "devIndex"     : clientMessage['devIndex'],
-                                            "type"         : clientMessage['sbType'],
-                                            "epStatus"     : clientMessage['epStatus'],
-                                            "lastModified" : datetime.now(),
-                                            "switch1"      : clientMessage['switch1'],
-                                            "switch2"      : clientMessage['switch2'],
-                                            "switch3"      : clientMessage['switch3'],
-                                            "switch4"      : clientMessage['switch4'],
-                                            "switch5"      : clientMessage['switch5'],
-                                            "switch6"      : clientMessage['switch6'],
-                                            "switch7"      : clientMessage['switch7'],
-                                            "switch8"      : clientMessage['switch8'],
-                                            }
-                         }
-                }
-            )
-        else:
-            hubStates.update_one({boardStr+".devIndex": clientMessage['devIndex']},
-                {"$set": {
-                            boardStr     : {
-                                            "devIndex"     : clientMessage['devIndex'],
-                                            "type"         : clientMessage['sbType'],
-                                            "epStatus"     : clientMessage['epStatus'],
-                                            "lastModified" : datetime.now(),
-                                            "switch1"      : clientMessage['switch1'],
-                                            "switch2"      : clientMessage['switch2'],
-                                            "switch3"      : clientMessage['switch3'],
-                                            "switch4"      : clientMessage['switch4'],
-                                            "switch5"      : clientMessage['switch5'],
-                                            "switch6"      : clientMessage['switch6'],
-                                            "switch7"      : clientMessage['switch7'],
-                                            "switch8"      : clientMessage['switch8'],
-                                            }
-                         }
-                }
-            )
+    hubStates[boardStr]  = {}
+    hubStates[boardStr]['devIndex']     = clientMessage['devIndex']
+    hubStates[boardStr]['type']         = clientMessage['sbType']
+    hubStates[boardStr]['epStatus']     = clientMessage['epStatus']
+    hubStates[boardStr]['lastModified'] = datetime.now()
+    hubStates[boardStr]['switch1']      = clientMessage['switch1']
+    hubStates[boardStr]['switch2']      = clientMessage['switch2']
+    hubStates[boardStr]['switch3']      = clientMessage['switch3']
+    hubStates[boardStr]['switch4']      = clientMessage['switch4']
+    hubStates[boardStr]['switch5']      = clientMessage['switch5']
+    hubStates[boardStr]['switch6']      = clientMessage['switch6']
+    hubStates[boardStr]['switch7']      = clientMessage['switch7']
+    hubStates[boardStr]['switch8']      = clientMessage['switch8']
 
 def updateNode(clientMessage):
     global hubStates
     boardStr = "board"+str(clientMessage['devIndex'])
-    nodeCursor =  hubStates.find_one({boardStr+".devIndex": clientMessage['devIndex']})
 
-    if nodeCursor is None:
-        print("The node to be updated is not present")
+    if boardStr in hubStates:
+        hubStates[boardStr]['lastModified'] = datetime.now()
+        hubStates[boardStr]['switch1']      = clientMessage['switch1']
+        hubStates[boardStr]['switch2']      = clientMessage['switch2']
+        hubStates[boardStr]['switch3']      = clientMessage['switch3']
+        hubStates[boardStr]['switch4']      = clientMessage['switch4']
+        hubStates[boardStr]['switch5']      = clientMessage['switch5']
+        hubStates[boardStr]['switch6']      = clientMessage['switch6']
+        hubStates[boardStr]['switch7']      = clientMessage['switch7']
+        hubStates[boardStr]['switch8']      = clientMessage['switch8']
     else:
-        hubStates.update_one({},
-            {"$set": {
-                        boardStr+".lastModified" : datetime.now(),
-                        boardStr+".switch1" : clientMessage['switch1'],
-                        boardStr+".switch2" : clientMessage['switch2'],
-                        boardStr+".switch3" : clientMessage['switch3'],
-                        boardStr+".switch4" : clientMessage['switch4'],
-                        boardStr+".switch5" : clientMessage['switch5'],
-                        boardStr+".switch6" : clientMessage['switch6'],
-                        boardStr+".switch7" : clientMessage['switch7'],
-                        boardStr+".switch8" : clientMessage['switch8'],
-                    }
-            })
+        print("The node to be updated is not present")
 
+def getHubState():
+    global hubStates
+    return hubStates
 
 def findNode(nodeid):
     boardStr = "board"+str(nodeid)
@@ -128,10 +61,6 @@ def findNode(nodeid):
             return node
     else:
             return None
-
-def getHubState():
-    hubStates.find_one()
-
 
 def addUser(username, password):
     cursor = hubUsers.find_one({"username": username})

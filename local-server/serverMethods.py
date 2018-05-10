@@ -36,7 +36,7 @@ def processMsgFromClient(connection, remote_server, Message):
     clientMessage = json.loads(Message)
     if clientMessage['message_type'] == SB_BOARD_INFO_RSP:
         print ("Info Response received")
-        serverDB.updateNode(connection, clientMessage)
+        serverDB.updateNode(clientMessage)
     elif clientMessage['message_type'] == SB_STATE_CHANGE_RSP:
         print ("State change Response received")
         connection.write_message(msg)
@@ -49,7 +49,7 @@ def processMsgFromClient(connection, remote_server, Message):
         '''
     elif clientMessage['message_type'] == SB_DEVICE_INFO_NTF:
         print("hub addr:%s" % format(clientMessage['hubAddr'], '#010x'))
-        serverDB.addHubStates(clientMessage, connection)
+        serverDB.addHubStates(clientMessage)
 
     if remote_server is not None:
         remote_server.write_message(Message)
