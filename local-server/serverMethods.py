@@ -58,3 +58,24 @@ def processMsgFromClient(connection, remote_server, Message):
     if remote_server is not None:
         remote_server.write_message(Message)
 
+def generateHubState():
+    # TODO: handle multiple nodes
+    hubStates = serverDB.hubStates
+    global dev_ready_ntf_capture
+    if hubStates is not None:
+        msg = {'message_type':SB_DEVICE_INFO_NTF}
+        msg['devIndex']     = hubStates['board1']['devIndex']
+        msg['sbType']       = hubStates['board1']['type']
+        msg['hubAddr']      = json.loads(dev_ready_ntf_capture)['hubAddr']
+        msg['epStatus']     = hubStates['board1']['epStatus']
+        msg['switch1']      = hubStates['board1']['switch1']
+        msg['switch2']      = hubStates['board1']['switch2']
+        msg['switch3']      = hubStates['board1']['switch3']
+        msg['switch4']      = hubStates['board1']['switch4']
+        msg['switch5']      = hubStates['board1']['switch5']
+        msg['switch6']      = hubStates['board1']['switch6']
+        msg['switch7']      = hubStates['board1']['switch7']
+        msg['switch8']      = hubStates['board1']['switch8']
+        return msg
+    else:
+        return None

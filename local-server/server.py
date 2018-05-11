@@ -107,6 +107,9 @@ def connect_server():
             print("Connected to global server")
             if serverMethods.dev_ready_ntf_capture is not None:
                 remote_server.write_message(serverMethods.dev_ready_ntf_capture)
+            hubStateMsg = serverMethods.generateHubState()
+            if hubStateMsg is not None:
+                remote_server.write_message(json.dumps(hubStateMsg))
 
 @gen.coroutine
 def global_server_read():
