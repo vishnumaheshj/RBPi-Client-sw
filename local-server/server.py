@@ -83,12 +83,12 @@ class Userhandler(tornado.web.RequestHandler):
             print("Dev_client connection not found\n")
         '''
         TODO : Sent this message properly to global server as well
+        TODO : DO the async update all user connection thing
         '''
         if (found == 0):
             self.write("Device not found\n")
-        '''
-        TODO : DO the async update all user connection thing
-        '''
+        else:
+            self.redirect(self.get_argument("next"))
 
 @gen.coroutine
 def connect_server():
