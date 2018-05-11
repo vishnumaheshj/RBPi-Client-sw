@@ -96,6 +96,7 @@ def connect_server():
     TODO : Do the read message from global server and self identification, auth, ip etc
     '''
     global remote_server
+    remote_server = None
     while remote_server is None:
         try:
             remote_server= yield tornado.websocket.websocket_connect("ws://dotslash.co/dev")
@@ -104,6 +105,8 @@ def connect_server():
             sleep(5)
         else:
             print("Connected to global server")
+            if serverMethods.dev_ready_ntf_capture is not None:
+                remote_server.write_message(serverMethods.dev_ready_ntf_capture)
 
 @gen.coroutine
 def global_server_read():
@@ -112,10 +115,10 @@ def global_server_read():
 
     while 1:
         msg = yield remote_server.read_message()
+        print("Message from global server")
         if msg:
             if  serverDB.devClientConnection is not None:
                 serverDB.devClientConnection.write_message(msg)
-                print("Message from global server")
                 print(msg)
         else:
             yield connect_server()

@@ -4,6 +4,7 @@ import serverDB
 
 messageList = {}
 messageNum = 0
+dev_ready_ntf_capture = None
 
 
 def prepareBoardInfoReq(nodeid):
@@ -42,6 +43,8 @@ def processMsgFromClient(connection, remote_server, Message):
         print ("State change Response received")
         connection.write_message(msg)
     elif clientMessage['message_type'] == SB_DEVICE_READY_NTF:
+        global dev_ready_ntf_capture
+        dev_ready_ntf_capture = Message
         print ("Hub is up and running")
         print("Message received %s\n" %clientMessage)
         serverDB.devClientConnection = connection
